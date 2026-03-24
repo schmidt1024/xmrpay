@@ -171,6 +171,16 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+select:-webkit-autofill,
+textarea:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-input) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 select {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -262,6 +272,8 @@ textarea {
   border: 1px solid var(--border);
   font-size: 0.85rem;
   padding: 0.6rem;
+  text-decoration: none;
+  text-align: center;
 }
 
 .btn-secondary:hover {
@@ -287,6 +299,20 @@ textarea {
   border-radius: var(--radius);
   padding: 12px;
   background: #fff;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.qr-container canvas:hover,
+.qr-container img:hover {
+  opacity: 0.85;
+}
+
+.qr-hint {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
 }
 
 .uri-box {

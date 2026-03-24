@@ -26,9 +26,8 @@
   const resultSection = $('#result');
   const qrContainer = $('#qr');
   const uriBox = $('#uri');
-  const copyUriBtn = $('#copyUri');
+  const openWalletBtn = $('#openWallet');
   const copyAddrBtn = $('#copyAddr');
-  const downloadBtn = $('#downloadQr');
   const countdownEl = $('#countdown');
   const fiatHint = $('#fiatHint');
   const toast = $('#toast');
@@ -47,10 +46,9 @@
   amountInput.addEventListener('input', updateFiatHint);
   currencySelect.addEventListener('change', updateFiatHint);
   generateBtn.addEventListener('click', generate);
-  copyUriBtn.addEventListener('click', () => copyToClipboard(uriBox.textContent));
   copyAddrBtn.addEventListener('click', () => copyToClipboard(addrInput.value.trim()));
   copyShareLinkBtn.addEventListener('click', () => copyToClipboard(shareLinkInput.value));
-  downloadBtn.addEventListener('click', downloadQR);
+  qrContainer.addEventListener('click', downloadQR);
   newRequestBtn.addEventListener('click', resetForm);
   homeLink.addEventListener('click', function (e) { e.preventDefault(); resetForm(); });
 
@@ -192,6 +190,7 @@
     // Show result
     resultSection.classList.add('visible');
     uriBox.textContent = uri;
+    openWalletBtn.href = uri;
 
     // Share link — show long URL immediately, then replace with short
     const hash = buildHash(addr, xmrAmount, desc, timer);
@@ -210,6 +209,10 @@
       colorLight: '#1a1a1a',
       correctLevel: QRCode.CorrectLevel.M
     });
+    const hint = document.createElement('div');
+    hint.className = 'qr-hint';
+    hint.textContent = I18n.t('qr_hint');
+    qrContainer.appendChild(hint);
 
     // Countdown
     startCountdown();

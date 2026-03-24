@@ -52,16 +52,20 @@ Die App ist eine einzige HTML-Datei, die von überall gehostet werden kann.
 
 ## Feature-Roadmap
 
-### v1 — Der Kern (Static QR Generator)
+### v1 — Der Kern (Static QR Generator) ✅
 
-- [ ] XMR-Adresse eingeben (mit Validierung)
-- [ ] Betrag in XMR eingeben (optional: EUR/CHF/USD-Umrechnung via CoinGecko API)
-- [ ] Beschreibung / Verwendungszweck
-- [ ] Optionaler Countdown-Timer (Zahlungsfrist)
-- [ ] `monero:`-URI generieren (Standard: [SLIP-0021](https://github.com/satoshilabs/slips/blob/master/slip-0021.md))
-- [ ] QR-Code anzeigen und als PNG downloaden
-- [ ] Link kopieren (für Messenger, E-Mail etc.)
-- [ ] Responsive Design, Dark Mode
+- [x] XMR-Adresse eingeben (Validierung: Standard, Subaddress, Integrated)
+- [x] Betrag in XMR eingeben (optional: EUR/CHF/USD-Umrechnung via CoinGecko API)
+- [x] Beschreibung / Verwendungszweck
+- [x] Optionaler Countdown-Timer (Zahlungsfrist)
+- [x] `monero:`-URI generieren
+- [x] QR-Code anzeigen und als PNG downloaden
+- [x] Link kopieren (für Messenger, E-Mail etc.)
+- [x] Teilbare Kurz-URLs (`/s/abc123`) — selbst gehostetes URL-Shortening
+- [x] Mehrsprachigkeit (DE, EN) mit automatischer Browsererkennung
+- [x] Responsive Design, Dark Mode
+- [x] Offline-fähig via Service Worker
+- [x] CoinGecko-Fallback mit Auto-Retry
 
 ### v2 — View-Key Zahlungsbestätigung (Browser-basiert)
 
@@ -75,7 +79,7 @@ Die App ist eine einzige HTML-Datei, die von überall gehostet werden kann.
 
 - [ ] PDF-Rechnung generieren (Logo, Betrag in Fiat, XMR-Betrag, QR, Fälligkeitsdatum)
 - [ ] Einbettbarer `<iframe>`-Widget für beliebige Websites
-- [ ] Mehrsprachigkeit (DE, EN, FR, ES)
+- [ ] Weitere Sprachen (FR, ES, ...)
 - [ ] Rechnungshistorie (LocalStorage, exportierbar als CSV)
 - [ ] „Pay Button" Generator (HTML-Snippet zum Einbetten)
 
@@ -135,14 +139,16 @@ um ihn mündlich weiterzugeben.
 ```
 xmrpay.link/
 ├── index.html          # Single-Page-App Entry Point
-├── app.js              # Haupt-Logik (URI-Builder, QR, Fiat-Kurs)
-├── monitor.js          # View-Key Monitoring (v2)
-├── invoice.js          # PDF-Generierung (v3)
-├── style.css
+├── app.js              # Haupt-Logik (URI-Builder, QR, Fiat-Kurs, Short-URLs)
+├── i18n.js             # Mehrsprachigkeit (DE, EN)
+├── style.css           # Dark Theme, Responsive
+├── sw.js               # Service Worker (Offline-Fähigkeit)
+├── s.php               # Kurz-URL Redirect
+├── api/
+│   └── shorten.php     # Kurz-URL Erstellung
+├── data/               # Kurz-URL Speicher (JSON, auto-generiert)
 ├── lib/
-│   ├── qrcode.min.js
-│   ├── monero.js       # monero-javascript WASM build
-│   └── jspdf.min.js
+│   └── qrcode.min.js   # QR-Code Generator
 ├── README.md
 └── LICENSE             # MIT
 ```

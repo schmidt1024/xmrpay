@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>xmrpay.link — Monero Invoice Generator</title>
+  <meta name="description" content="Create Monero payment requests in seconds. No account, no backend, no KYC.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛏️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1><a href="/" id="homeLink">xmr<span>pay</span>.link</a></h1>
+    <p data-i18n="subtitle"></p>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="field">
+        <label for="addr" data-i18n="label_addr"></label>
+        <input type="text" id="addr" data-i18n-placeholder="placeholder_addr" spellcheck="false" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="amount" data-i18n="label_amount"></label>
+        <div class="amount-row">
+          <input type="number" id="amount" placeholder="0.00" min="0" step="any">
+          <select id="currency">
+            <option value="XMR">XMR</option>
+            <option value="EUR" selected>EUR</option>
+            <option value="USD">USD</option>
+            <option value="CHF">CHF</option>
+          </select>
+        </div>
+        <div class="fiat-hint" id="fiatHint"></div>
+      </div>
+
+      <div class="field">
+        <label for="desc" data-i18n="label_desc"></label>
+        <textarea id="desc" data-i18n-placeholder="placeholder_desc"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="timer" data-i18n="label_timer"></label>
+        <input type="number" id="timer" data-i18n-placeholder="placeholder_timer" min="1" step="1">
+      </div>
+
+      <button class="btn btn-primary" id="generate" disabled data-i18n="btn_generate"></button>
+    </div>
+
+    <div id="result" class="card">
+      <div class="qr-container" id="qr"></div>
+      <div class="countdown" id="countdown"></div>
+      <div class="uri-box" id="uri"></div>
+      <div class="share-link-box" id="shareLinkBox">
+        <label data-i18n="label_share_link"></label>
+        <div class="share-link-row">
+          <input type="text" id="shareLink" readonly>
+          <button class="btn btn-secondary btn-icon" id="copyShareLink" title="Copy">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" id="copyUri" data-i18n="btn_copy_link"></button>
+        <button class="btn btn-secondary" id="copyAddr" data-i18n="btn_copy_addr"></button>
+        <button class="btn btn-secondary" id="downloadQr" data-i18n="btn_download_qr"></button>
+      </div>
+      <button class="btn btn-primary btn-new" id="newRequest" data-i18n="btn_new_request"></button>
+    </div>
+  </main>
+
+  <footer>
+    <p data-i18n-html="footer"></p>
+  </footer>
+
+  <div class="lang-picker" id="langPicker">
+    <button class="lang-toggle" id="langToggle" aria-label="Language">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M2 12h20"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/>
+      </svg>
+      <span id="langCurrent">DE</span>
+    </button>
+    <div class="lang-dropdown" id="langDropdown"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="lib/qrcode.min.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

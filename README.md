@@ -2,7 +2,7 @@
 
 > Private. Self-hosted. No accounts. No backend. No bullshit.
 
-**[Live Demo: xmrpay.link](https://xmrpay.link)**
+**[Live: xmrpay.link](https://xmrpay.link)** · **[Tor: mc6wfe...zyd.onion](http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion)**
 
 ---
 

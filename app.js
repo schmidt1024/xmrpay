@@ -620,21 +620,28 @@
     }
 
     // --- Payment Status ---
-    if (paymentStatus.classList.contains('paid')) {
+    if (lastPaidData) {
       y += 4;
+      var paidDateStr = '';
+      if (lastPaidData.verified_at) {
+        var pd = new Date(lastPaidData.verified_at * 1000);
+        paidDateStr = pd.toLocaleDateString(I18n.getLang() === 'de' ? 'de-CH' : 'en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+      }
+      var paidLine = lastPaidData.amount.toFixed(6) + ' XMR — TX ' +
+        lastPaidData.tx_hash.substring(0, 8) + '...' +
+        (paidDateStr ? ' — ' + paidDateStr : '');
+
       doc.setFillColor(76, 175, 80);
       doc.roundedRect(margin, y - 4, contentW, 16, 2, 2, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(12);
       doc.setTextColor(255, 255, 255);
-      doc.text(I18n.t('status_paid').toUpperCase(), margin + contentW / 2, y + 2, { align: 'center' });
-      // Extract details from the paid-detail div
-      var paidDetail = paymentStatus.querySelector('.paid-detail');
-      if (paidDetail) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-        doc.text(paidDetail.textContent, margin + contentW / 2, y + 8, { align: 'center' });
-      }
+      doc.text(I18n.t('status_paid').toUpperCase(), margin + contentW / 2, y + 1, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.text(paidLine, margin + contentW / 2, y + 7, { align: 'center' });
       y += 22;
     }
 

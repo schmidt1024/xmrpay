@@ -376,10 +376,6 @@ var I18n = (function () {
 
     applyDOM(t);
 
-    // Update toggle label
-    var cur = document.getElementById('langCurrent');
-    if (cur) cur.textContent = languages[lang].name;
-
     // Update dropdown active state
     document.querySelectorAll('.lang-option').forEach(function (btn) {
       btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);

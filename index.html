@@ -29,9 +29,13 @@
           <input type="number" id="amount" placeholder="0.00" min="0" step="any">
           <select id="currency" data-i18n-aria="aria_currency" aria-label="Currency">
             <option value="XMR">XMR</option>
-            <option value="EUR" selected>EUR</option>
-            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="USD" selected>USD</option>
             <option value="CHF">CHF</option>
+            <option value="GBP">GBP</option>
+            <option value="JPY">JPY</option>
+            <option value="RUB">RUB</option>
+            <option value="BRL">BRL</option>
           </select>
         </div>
         <div class="fiat-hint" id="fiatHint"></div>
@@ -112,7 +116,6 @@
         <path d="M2 12h20"/>
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/>
       </svg>
-      <span id="langCurrent">English</span>
     </button>
     <div class="lang-dropdown" id="langDropdown"></div>
   </div>

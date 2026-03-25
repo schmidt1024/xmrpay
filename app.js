@@ -2,7 +2,7 @@
   'use strict';
 
   // --- Config ---
-  const COINGECKO_API = '/api/rates.php';
+  const COINGECKO_API = '/api/rates.php?c=eur,usd,chf,gbp,jpy,rub,brl';
   // Standard address (4..., 95 chars), Subaddress (8..., 95 chars), Integrated address (4..., 106 chars)
   const XMR_STANDARD_REGEX = /^[48][1-9A-HJ-NP-Za-km-z]{94}$/;
   const XMR_INTEGRATED_REGEX = /^4[1-9A-HJ-NP-Za-km-z]{105}$/;
@@ -13,6 +13,7 @@
   let fiatRates = null;
   let ratesTimestamp = 0;
   let countdownInterval = null;
+  let countdownTick = null;
   let ratesFailed = false;
   let invoiceCode = null; // short URL code for this invoice
 
@@ -53,7 +54,35 @@
   let pdfLoaded = false;
   let lastPaidData = null;
 
+  // --- Currency Detection ---
+  function detectCurrency() {
+    var localeToCurrency = {
+      'de': 'EUR', 'fr': 'EUR', 'it': 'EUR', 'es': 'EUR', 'pt': 'EUR', 'nl': 'EUR',
+      'de-CH': 'CHF', 'fr-CH': 'CHF', 'it-CH': 'CHF',
+      'de-AT': 'EUR',
+      'en-GB': 'GBP',
+      'en-US': 'USD', 'en': 'USD',
+      'ja': 'JPY',
+      'ru': 'RUB',
+      'pt-BR': 'BRL'
+    };
+    var langs = navigator.languages || [navigator.language || 'en'];
+    for (var i = 0; i < langs.length; i++) {
+      var tag = langs[i];
+      if (localeToCurrency[tag]) {
+        currencySelect.value = localeToCurrency[tag];
+        return;
+      }
+      var short = tag.substring(0, 2).toLowerCase();
+      if (localeToCurrency[short]) {
+        currencySelect.value = localeToCurrency[short];
+        return;
+      }
+    }
+  }
+
   // --- Init ---
+  detectCurrency();
   fetchRates();
   loadFromHash() || loadSaved();
   registerSW();
@@ -77,6 +106,8 @@
       buildSummary(xmrAmount, desc, selectedDays);
       updatePageTitle(xmrAmount, desc);
     }
+    // Countdown text
+    if (countdownTick) countdownTick();
   });
 
   // --- Events ---
@@ -410,6 +441,7 @@
       }
     }
 
+    countdownTick = tick;
     tick();
     countdownInterval = setInterval(tick, 60000); // Update every minute, not every second
   }

@@ -15,7 +15,9 @@ if (file_exists($cacheFile)) {
     }
 }
 
-$url = 'https://api.coingecko.com/api/v3/simple/price?ids=monero&vs_currencies=eur,usd,chf';
+$currencies = $_GET['c'] ?? 'eur,usd,chf,gbp,jpy,rub,brl';
+$currencies = preg_replace('/[^a-z,]/', '', strtolower($currencies));
+$url = 'https://api.coingecko.com/api/v3/simple/price?ids=monero&vs_currencies=' . $currencies;
 $ch = curl_init($url);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,

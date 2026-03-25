@@ -32,12 +32,12 @@ Enter your address, the amount, an optional description — and get a QR code, a
 
 ### Invoice Generation
 - XMR address input with validation (standard, subaddress, integrated)
-- Amount in XMR or fiat (EUR/CHF/USD conversion via CoinGecko)
+- Amount in XMR or fiat (EUR/USD/CHF/GBP/JPY/RUB/BRL via CoinGecko, auto-detected)
 - Description and payment deadline (7/14/30 days or custom)
 - QR code with `monero:` URI
 - Shareable short URLs (`/s/abc123`)
 - PDF invoice download (with QR, amount, fiat equivalent, deadline)
-- i18n (English, German) with automatic browser detection
+- i18n (EN, DE, FR, IT, ES, PT, RU) with automatic browser detection
 
 ### Payment Verification (TX Proof)
 - Sender provides TX Hash + TX Key from their wallet
@@ -127,7 +127,6 @@ Requirements for full functionality:
 ## Roadmap
 
 - [ ] Embeddable `<iframe>` payment widget
-- [ ] Additional languages (FR, ES, ...)
 - [ ] Invoice history (LocalStorage, CSV export)
 - [ ] "Pay Button" generator (HTML snippet)
 

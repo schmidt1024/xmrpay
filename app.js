@@ -14,6 +14,7 @@
   let ratesTimestamp = 0;
   let countdownInterval = null;
   let ratesFailed = false;
+  let invoiceCode = null; // short URL code for this invoice
 
   // --- DOM ---
   const $ = (s) => document.querySelector(s);
@@ -111,6 +112,7 @@
     uriBox.textContent = '';
     shareLinkInput.value = '';
     // Reset proof
+    invoiceCode = null;
     proofPanel.classList.remove('open');
     txHashInput.value = '';
     txKeyInput.value = '';
@@ -221,6 +223,7 @@
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
+      if (!invoiceCode) invoiceCode = data.code;
       return location.origin + '/s/' + data.code;
     } catch (e) {
       console.warn('Short URL failed:', e);
@@ -309,6 +312,7 @@
     // Check for short URL code and load payment status
     const code = params.get('c');
     if (code) {
+      invoiceCode = code;
       setTimeout(function () { loadPaymentStatus(code); }, 200);
     }
 
@@ -534,14 +538,12 @@
         proofResult.textContent = I18n.t('proof_verified').replace('{amount}', xmrAmount.toFixed(6));
 
         // Store proof with invoice
-        var shareUrl = shareLinkInput.value;
-        var codeMatch = shareUrl.match(/\/s\/([a-z0-9]+)/);
-        if (codeMatch) {
+        if (invoiceCode) {
           await fetch('/api/verify.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              code: codeMatch[1],
+              code: invoiceCode,
               tx_hash: txHash,
               amount: xmrAmount,
               confirmations: tx.confirmations || 0

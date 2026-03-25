@@ -7,8 +7,9 @@
   <meta name="description" content="Create Monero payment requests in seconds. No account, no backend, no KYC.">
   <link rel="icon" id="favicon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 </head>
 <body>
 
@@ -28,7 +29,7 @@
         <label for="amount" data-i18n="label_amount"></label>
         <div class="amount-row">
           <input type="number" id="amount" placeholder="0.00" min="0" step="any">
-          <select id="currency">
+          <select id="currency" data-i18n-aria="aria_currency">
             <option value="XMR">XMR</option>
             <option value="EUR" selected>EUR</option>
             <option value="USD">USD</option>
@@ -59,15 +60,13 @@
     <div id="result" class="card">
       <div class="qr-container" id="qr"></div>
       <div class="payment-summary" id="paymentSummary"></div>
+      <div class="payment-status" id="paymentStatus"></div>
       <div class="countdown" id="countdown"></div>
-      <details class="uri-details">
-        <summary data-i18n="label_uri_details"></summary>
-        <div class="uri-box" id="uri"></div>
-      </details>
+      <div class="uri-box" id="uri" style="display:none"></div>
       <div class="share-link-box" id="shareLinkBox">
         <label data-i18n="label_share_link"></label>
         <div class="share-link-row">
-          <input type="text" id="shareLink" readonly>
+          <input type="text" id="shareLink" readonly data-i18n-aria="label_share_link">
           <button class="btn btn-secondary btn-icon" id="copyShareLink" title="Copy">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           </button>
@@ -100,10 +99,6 @@
           <div class="proof-result" id="proofResult"></div>
         </div>
       </div>
-
-      <!-- Payment status (shown when proof is stored) -->
-      <div class="payment-status" id="paymentStatus"></div>
-
       <button class="btn btn-primary btn-new" id="newRequest" data-i18n="btn_new_request"></button>
     </div>
   </main>
@@ -126,8 +121,8 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="lib/qrcode.min.js"></script>
-  <script src="i18n.js"></script>
-  <script src="app.js"></script>
+  <script src="lib/qrcode.min.js" defer></script>
+  <script src="i18n.min.js" defer></script>
+  <script src="app.min.js" defer></script>
 </body>
 </html>

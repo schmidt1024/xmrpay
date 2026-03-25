@@ -51,11 +51,33 @@
   const downloadPdfBtn = $('#downloadPdf');
   let cryptoLoaded = false;
   let pdfLoaded = false;
+  let lastPaidData = null;
 
   // --- Init ---
   fetchRates();
   loadFromHash() || loadSaved();
   registerSW();
+
+  // Re-render dynamic texts on language change
+  I18n.onChange(function () {
+    // QR hint
+    var hint = qrContainer.querySelector('.qr-hint');
+    if (hint) hint.textContent = I18n.t('qr_hint');
+    // Paid stamp
+    var stamp = qrContainer.querySelector('.paid-stamp');
+    if (stamp) stamp.textContent = I18n.t('status_paid');
+    // Paid detail
+    if (lastPaidData) {
+      showPaidStatus(lastPaidData);
+    }
+    // Summary
+    if (resultSection.classList.contains('visible')) {
+      var xmrAmount = getXmrAmount();
+      var desc = descInput.value.trim();
+      buildSummary(xmrAmount, desc, selectedDays);
+      updatePageTitle(xmrAmount, desc);
+    }
+  });
 
   // --- Events ---
   addrInput.addEventListener('input', validateAddress);
@@ -792,17 +814,40 @@
 
   function showPaidStatus(data) {
     paymentStatus.className = 'payment-status paid';
-    var dateStr = '';
-    if (data.verified_at) {
-      var d = new Date(data.verified_at * 1000);
-      dateStr = ' — ' + d.toLocaleDateString(I18n.getLang() === 'de' ? 'de-CH' : 'en-US', {
-        year: 'numeric', month: 'long', day: 'numeric'
-      });
+
+    // Stamp over QR + dim QR
+    qrContainer.classList.add('paid');
+    var existingStamp = qrContainer.querySelector('.paid-stamp');
+    if (!existingStamp) {
+      var stamp = document.createElement('div');
+      stamp.className = 'paid-stamp';
+      stamp.textContent = I18n.t('status_paid');
+      qrContainer.appendChild(stamp);
+    } else {
+      existingStamp.textContent = I18n.t('status_paid');
     }
-    paymentStatus.innerHTML = '<div class="paid-badge">' + I18n.t('status_paid') +
-      '</div><div class="paid-detail">' + data.amount.toFixed(6) + ' XMR — TX ' +
-      data.tx_hash.substring(0, 8) + '...' + dateStr + '</div>';
-    // Hide proof section when paid
+
+    // Replace QR hint with payment detail
+    var hint = qrContainer.querySelector('.qr-hint');
+    if (hint) {
+      var dateStr = '';
+      if (data.verified_at) {
+        var d = new Date(data.verified_at * 1000);
+        dateStr = ' — ' + d.toLocaleDateString(I18n.getLang() === 'de' ? 'de-CH' : 'en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+      }
+      hint.textContent = data.amount.toFixed(6) + ' XMR — TX ' +
+        data.tx_hash.substring(0, 8) + '...' + dateStr;
+      hint.className = 'qr-hint paid-info';
+    }
+
+    paymentStatus.innerHTML = '';
+    lastPaidData = data;
+
+    // Hide unnecessary buttons when paid
+    openWalletBtn.style.display = 'none';
+    document.getElementById('copyAddr').style.display = 'none';
     var proofSection = document.getElementById('proofSection');
     if (proofSection) proofSection.style.display = 'none';
     setPaidFavicon();

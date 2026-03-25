@@ -32,6 +32,7 @@ var I18n = (function () {
       pdf_footer: 'Erstellt mit xmrpay.link — Keine Registrierung, kein KYC',
       qr_hint: 'Klick auf QR zum Speichern',
       footer: 'Open Source &middot; Kein Backend &middot; Kein KYC &middot; <a href="https://gitea.schmidt.eco/schmidt1024/xmrpay.link" target="_blank">Source</a>',
+      aria_currency: 'Währung',
       label_uri_details: 'Monero-URI anzeigen',
       label_share_link: 'Teilbarer Link',
       btn_new_request: 'Neue Zahlungsanforderung',
@@ -78,6 +79,7 @@ var I18n = (function () {
       pdf_footer: 'Created with xmrpay.link — No registration, no KYC',
       qr_hint: 'Click QR to save',
       footer: 'Open Source &middot; No Backend &middot; No KYC &middot; <a href="https://gitea.schmidt.eco/schmidt1024/xmrpay.link" target="_blank">Source</a>',
+      aria_currency: 'Currency',
       label_uri_details: 'Show Monero URI',
       label_share_link: 'Shareable link',
       btn_new_request: 'New payment request',
@@ -126,6 +128,9 @@ var I18n = (function () {
     document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
       el.innerHTML = t[el.getAttribute('data-i18n-html')] || '';
     });
+    document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
+      el.setAttribute('aria-label', t[el.getAttribute('data-i18n-aria')] || '');
+    });
   }
 
   function apply(lang) {
@@ -144,6 +149,16 @@ var I18n = (function () {
     document.querySelectorAll('.lang-option').forEach(function (btn) {
       btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
+
+    // Notify listeners
+    for (var i = 0; i < onChangeCallbacks.length; i++) {
+      onChangeCallbacks[i](lang);
+    }
+  }
+
+  var onChangeCallbacks = [];
+  function onChange(fn) {
+    onChangeCallbacks.push(fn);
   }
 
   function buildDropdown() {
@@ -205,5 +220,5 @@ var I18n = (function () {
     apply(currentLang);
   });
 
-  return { t: t, apply: apply, getLang: getLang };
+  return { t: t, apply: apply, getLang: getLang, onChange: onChange };
 })();

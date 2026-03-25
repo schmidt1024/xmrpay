@@ -5,8 +5,10 @@ var ASSETS = [
   '/app.js',
   '/i18n.js',
   '/style.css',
-  '/lib/qrcode.min.js'
-  // xmr-crypto.bundle.js is lazy-loaded and runtime-cached
+  '/lib/qrcode.min.js',
+  '/fonts/inter-400.woff2',
+  '/fonts/jetbrains-400.woff2'
+  // xmr-crypto.bundle.js and jspdf.min.js are lazy-loaded and runtime-cached
 ];
 
 self.addEventListener('install', function (e) {

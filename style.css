@@ -325,6 +325,12 @@ textarea {
 
 #result.visible {
   display: block;
+  animation: fadeSlideIn 0.3s ease;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .qr-container {
@@ -355,6 +361,48 @@ textarea {
   margin-top: 0.3rem;
 }
 
+.payment-summary {
+  text-align: center;
+  padding: 0.5rem 0 0.8rem;
+}
+
+.summary-amount {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  font-family: var(--mono);
+}
+
+.summary-fiat {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.1rem;
+}
+
+.summary-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  font-style: italic;
+}
+
+.uri-details {
+  margin-bottom: 0.8rem;
+}
+
+.uri-details summary {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.3rem 0;
+}
+
+.uri-details summary:hover {
+  color: var(--text);
+}
+
 .uri-box {
   background: var(--bg-input);
   border: 1px solid var(--border);
@@ -364,7 +412,7 @@ textarea {
   font-size: 0.75rem;
   word-break: break-all;
   color: var(--text-muted);
-  margin-bottom: 0.8rem;
+  margin-top: 0.4rem;
   max-height: 80px;
   overflow-y: auto;
 }
@@ -401,10 +449,16 @@ textarea {
 .actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .actions .btn-secondary {
-  flex: 1;
+  flex: 1 1 30%;
+  min-width: 0;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* --- TX Proof Section --- */
@@ -415,7 +469,7 @@ textarea {
   padding-top: 0.8rem;
 }
 
-.btn-monitor {
+.btn-proof {
   width: 100%;
   display: flex;
   align-items: center;
@@ -433,7 +487,7 @@ textarea {
   font-family: var(--font);
 }
 
-.btn-monitor:hover {
+.btn-proof:hover {
   border-color: var(--accent);
   color: var(--text);
 }
@@ -571,5 +625,13 @@ footer a:hover {
   }
   header h1 {
     font-size: 1.5rem;
+  }
+  .qr-container canvas,
+  .qr-container img {
+    max-width: 80vw;
+    height: auto;
+  }
+  .summary-amount {
+    font-size: 1.3rem;
   }
 }

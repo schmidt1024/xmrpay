@@ -47,7 +47,10 @@
   const verifyProofBtn = $('#verifyProof');
   const proofResult = $('#proofResult');
   const paymentStatus = $('#paymentStatus');
+  const paymentSummary = $('#paymentSummary');
+  const downloadPdfBtn = $('#downloadPdf');
   let cryptoLoaded = false;
+  let pdfLoaded = false;
 
   // --- Init ---
   fetchRates();
@@ -86,6 +89,9 @@
     selectedDays = parseInt(timerCustom.value) || 0;
   });
 
+  // PDF
+  downloadPdfBtn.addEventListener('click', generatePdf);
+
   // TX Proof events
   proofToggle.addEventListener('click', toggleProofPanel);
   txHashInput.addEventListener('input', validateProofInputs);
@@ -121,6 +127,8 @@
     proofResult.className = 'proof-result';
     paymentStatus.innerHTML = '';
     paymentStatus.className = 'payment-status';
+    paymentSummary.innerHTML = '';
+    document.title = 'xmrpay.link \u2014 Monero Invoice Generator';
     history.replaceState(null, '', location.pathname);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     addrInput.focus();
@@ -243,7 +251,11 @@
     // Show result
     resultSection.classList.add('visible');
     uriBox.textContent = uri;
-    openWalletBtn.href = uri;
+    openWalletBtn.onclick = function () { window.location.href = uri; };
+
+    // Payment summary + page title
+    buildSummary(xmrAmount, desc, timer);
+    updatePageTitle(xmrAmount, desc);
 
     // Share link — show long URL immediately, then replace with short
     const hash = buildHash(addr, xmrAmount, desc, timer);
@@ -321,6 +333,31 @@
     return true;
   }
 
+  function buildSummary(xmrAmount, desc, days) {
+    var html = '';
+    if (xmrAmount) {
+      html += '<div class="summary-amount">' + xmrAmount.toFixed(8) + ' XMR</div>';
+      var amount = parseFloat(amountInput.value);
+      var currency = currencySelect.value;
+      if (currency !== 'XMR' && amount) {
+        html += '<div class="summary-fiat">\u2248 ' + amount.toFixed(2) + ' ' + currency + '</div>';
+      }
+    }
+    if (desc) {
+      html += '<div class="summary-desc">' + desc.replace(/</g, '&lt;') + '</div>';
+    }
+    paymentSummary.innerHTML = html;
+  }
+
+  function updatePageTitle(xmrAmount, desc) {
+    var parts = [];
+    if (xmrAmount) parts.push(xmrAmount.toFixed(4) + ' XMR');
+    if (desc) parts.push(desc);
+    if (parts.length) {
+      document.title = parts.join(' — ') + ' | xmrpay.link';
+    }
+  }
+
   function startCountdown() {
     if (countdownInterval) clearInterval(countdownInterval);
     countdownEl.textContent = '';
@@ -342,18 +379,17 @@
       const d = Math.floor(remaining / 86400000);
       const h = Math.floor((remaining % 86400000) / 3600000);
       const m = Math.floor((remaining % 3600000) / 60000);
-      const s = Math.floor((remaining % 60000) / 1000);
       if (d > 0) {
         countdownEl.textContent = I18n.t('countdown_remaining_days')
-          .replace('{d}', d).replace('{h}', pad(h)).replace('{m}', pad(m)).replace('{s}', pad(s));
+          .replace('{d}', d).replace('{h}', h);
       } else {
         countdownEl.textContent = I18n.t('countdown_remaining_hours')
-          .replace('{h}', pad(h)).replace('{m}', pad(m)).replace('{s}', pad(s));
+          .replace('{h}', pad(h)).replace('{m}', pad(m));
       }
     }
 
     tick();
-    countdownInterval = setInterval(tick, 1000);
+    countdownInterval = setInterval(tick, 60000); // Update every minute, not every second
   }
 
   function pad(n) {
@@ -419,6 +455,186 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function () {});
     }
+  }
+
+  // --- PDF Invoice ---
+
+  function loadJsPdf() {
+    return new Promise(function (resolve, reject) {
+      if (window.jspdf) { resolve(); return; }
+      var script = document.createElement('script');
+      script.src = 'lib/jspdf.min.js';
+      script.onload = function () { pdfLoaded = true; resolve(); };
+      script.onerror = function () { reject(new Error('Failed to load jsPDF')); };
+      document.head.appendChild(script);
+    });
+  }
+
+  async function generatePdf() {
+    await loadJsPdf();
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    var addr = addrInput.value.trim();
+    var xmrAmount = getXmrAmount();
+    var desc = descInput.value.trim();
+    var amount = parseFloat(amountInput.value);
+    var currency = currencySelect.value;
+    var pageW = doc.internal.pageSize.getWidth();
+    var margin = 20;
+    var contentW = pageW - margin * 2;
+    var y = margin;
+
+    // --- Header: Orange accent bar ---
+    doc.setFillColor(242, 104, 33);
+    doc.rect(0, 0, pageW, 8, 'F');
+
+    // --- Title ---
+    y = 22;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(242, 104, 33);
+    doc.text(I18n.t('pdf_title'), margin, y);
+
+    // --- Date (top right) ---
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(120, 120, 120);
+    var dateStr = new Date().toLocaleDateString(I18n.getLang() === 'de' ? 'de-CH' : 'en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
+    doc.text(I18n.t('pdf_date') + ': ' + dateStr, pageW - margin, y, { align: 'right' });
+
+    // --- Divider ---
+    y += 6;
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, pageW - margin, y);
+
+    // --- QR Code (right side) ---
+    var qrCanvas = qrContainer.querySelector('canvas');
+    var qrSize = 50;
+    var qrX = pageW - margin - qrSize;
+    var qrY = y + 6;
+    if (qrCanvas) {
+      var qrData = qrCanvas.toDataURL('image/png');
+      doc.addImage(qrData, 'PNG', qrX, qrY, qrSize, qrSize);
+      // QR hint
+      doc.setFontSize(7);
+      doc.setTextColor(150, 150, 150);
+      doc.text(I18n.t('pdf_scan_qr'), qrX + qrSize / 2, qrY + qrSize + 4, { align: 'center' });
+    }
+
+    // --- Invoice details (left side, next to QR) ---
+    var detailX = margin;
+    var detailW = qrX - margin - 10;
+    y += 14;
+
+    function addField(label, value) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(150, 150, 150);
+      doc.text(label, detailX, y);
+      y += 5;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(40, 40, 40);
+      var lines = doc.splitTextToSize(value, detailW);
+      doc.text(lines, detailX, y);
+      y += lines.length * 5 + 4;
+    }
+
+    // Amount
+    if (xmrAmount) {
+      var amountStr = xmrAmount.toFixed(8) + ' XMR';
+      if (currency !== 'XMR' && amount) {
+        amountStr += '  (\u2248 ' + amount.toFixed(2) + ' ' + currency + ')';
+      }
+      addField(I18n.t('pdf_amount'), amountStr);
+    }
+
+    // Description
+    if (desc) {
+      addField(I18n.t('pdf_desc'), desc);
+    }
+
+    // Deadline
+    if (selectedDays > 0) {
+      var deadlineDate = new Date(Date.now() + selectedDays * 86400000);
+      var deadlineStr = deadlineDate.toLocaleDateString(I18n.getLang() === 'de' ? 'de-CH' : 'en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+      addField(I18n.t('pdf_deadline'), deadlineStr + ' (' + I18n.t('pdf_deadline_days').replace('{d}', selectedDays) + ')');
+    }
+
+    // Address (below QR if needed, full width)
+    y = Math.max(y, qrY + qrSize + 12);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(150, 150, 150);
+    doc.text(I18n.t('pdf_address'), margin, y);
+    y += 5;
+
+    // Address in monospace box
+    doc.setFillColor(245, 245, 245);
+    doc.roundedRect(margin, y - 3.5, contentW, 10, 2, 2, 'F');
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(60, 60, 60);
+    doc.text(addr, margin + 3, y + 2.5);
+    y += 14;
+
+    // monero: URI
+    var uri = uriBox.textContent;
+    if (uri) {
+      doc.setFillColor(245, 245, 245);
+      doc.roundedRect(margin, y - 3.5, contentW, 10, 2, 2, 'F');
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(100, 100, 100);
+      var uriLines = doc.splitTextToSize(uri, contentW - 6);
+      doc.text(uriLines, margin + 3, y + 2);
+      y += uriLines.length * 3 + 10;
+    }
+
+    // --- Payment Status ---
+    if (paymentStatus.classList.contains('paid')) {
+      y += 4;
+      doc.setFillColor(76, 175, 80);
+      doc.roundedRect(margin, y - 4, contentW, 16, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(255, 255, 255);
+      doc.text(I18n.t('status_paid').toUpperCase(), margin + contentW / 2, y + 2, { align: 'center' });
+      // Extract details from the paid-detail div
+      var paidDetail = paymentStatus.querySelector('.paid-detail');
+      if (paidDetail) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.text(paidDetail.textContent, margin + contentW / 2, y + 8, { align: 'center' });
+      }
+      y += 22;
+    }
+
+    // --- Footer ---
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.3);
+    var footerY = doc.internal.pageSize.getHeight() - 15;
+    doc.line(margin, footerY, pageW - margin, footerY);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(180, 180, 180);
+    doc.text(I18n.t('pdf_footer'), pageW / 2, footerY + 5, { align: 'center' });
+
+    // Share link
+    var shareLink = shareLinkInput.value;
+    if (shareLink) {
+      doc.text(shareLink, pageW / 2, footerY + 9, { align: 'center' });
+    }
+
+    // Save
+    var filename = 'xmrpay-' + (desc ? desc.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30) : 'invoice') + '.pdf';
+    doc.save(filename);
   }
 
   // --- TX Proof Functions ---
@@ -576,9 +792,19 @@
 
   function showPaidStatus(data) {
     paymentStatus.className = 'payment-status paid';
+    var dateStr = '';
+    if (data.verified_at) {
+      var d = new Date(data.verified_at * 1000);
+      dateStr = ' — ' + d.toLocaleDateString(I18n.getLang() === 'de' ? 'de-CH' : 'en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
     paymentStatus.innerHTML = '<div class="paid-badge">' + I18n.t('status_paid') +
       '</div><div class="paid-detail">' + data.amount.toFixed(6) + ' XMR — TX ' +
-      data.tx_hash.substring(0, 8) + '...</div>';
+      data.tx_hash.substring(0, 8) + '...' + dateStr + '</div>';
+    // Hide proof section when paid
+    var proofSection = document.getElementById('proofSection');
+    if (proofSection) proofSection.style.display = 'none';
     setPaidFavicon();
   }
 

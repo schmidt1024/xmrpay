@@ -58,8 +58,12 @@
 
     <div id="result" class="card">
       <div class="qr-container" id="qr"></div>
+      <div class="payment-summary" id="paymentSummary"></div>
       <div class="countdown" id="countdown"></div>
-      <div class="uri-box" id="uri"></div>
+      <details class="uri-details">
+        <summary data-i18n="label_uri_details"></summary>
+        <div class="uri-box" id="uri"></div>
+      </details>
       <div class="share-link-box" id="shareLinkBox">
         <label data-i18n="label_share_link"></label>
         <div class="share-link-row">
@@ -70,12 +74,13 @@
         </div>
       </div>
       <div class="actions">
-        <a class="btn btn-secondary" id="openWallet" href="#" data-i18n="btn_open_wallet"></a>
+        <button class="btn btn-secondary" id="openWallet" data-i18n="btn_open_wallet"></button>
         <button class="btn btn-secondary" id="copyAddr" data-i18n="btn_copy_addr"></button>
+        <button class="btn btn-secondary" id="downloadPdf" data-i18n="btn_download_pdf"></button>
       </div>
       <!-- TX Proof Verification -->
       <div class="proof-section" id="proofSection">
-        <button class="btn btn-monitor" id="proofToggle">
+        <button class="btn btn-proof" id="proofToggle">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
             <polyline points="22 4 12 14.01 9 11.01"/>

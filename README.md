@@ -1,179 +1,138 @@
-# xmrpay.link — Serverless XMR Invoice Builder
+# xmrpay.link — Monero Invoice Generator
 
-> Privat. Selbst gehostet. Keine Accounts. Kein Backend. Kein Bullshit.
+> Private. Self-hosted. No accounts. No backend. No bullshit.
 
----
-
-## Idee
-
-**xmrpay.link** ist eine rein clientseitige Web-App, die es jedem ermöglicht,
-in unter 30 Sekunden eine professionelle Monero-Zahlungsanforderung zu erstellen —
-ohne eigenen Node, ohne Registration, ohne KYC, ohne Drittanbieter.
-
-Du gibst deine Adresse ein, den Betrag, eine optionale Beschreibung —
-und bekommst einen QR-Code, einen kopierbaren `monero:`-Link und eine
-optionale PDF-Rechnung. Fertig.
+**[Live Demo: xmrpay.link](https://xmrpay.link)**
 
 ---
 
-## Das Problem (Warum es das noch nicht gibt)
+## What is this?
 
-| Lösung | Problem |
+**xmrpay.link** is a client-side web app that lets anyone create a professional Monero payment request in under 30 seconds — no node, no registration, no KYC, no third parties.
+
+Enter your address, the amount, an optional description — and get a QR code, a shareable short link, and a PDF invoice. Done.
+
+---
+
+## Why?
+
+| Solution | Problem |
 |---|---|
-| **BTCPay Server** | Eigener Server nötig, komplexes Setup |
-| **NOWPayments, Globee** | Custodial, KYC, Fees, Drittanbieter-Abhängigkeit |
-| **Cake Wallet Invoice** | Mobil-only, kein Teilen ohne App |
-| **MoneroPay** | Backend-Daemon nötig, nur für Entwickler |
-| **Wallet-QR direkt** | Kein Betrag, keine Beschreibung, keine Bestätigung |
+| **BTCPay Server** | Requires own server, complex setup |
+| **NOWPayments, Globee** | Custodial, KYC, fees, third-party dependency |
+| **Cake Wallet Invoice** | Mobile-only, no sharing without app |
+| **MoneroPay** | Backend daemon required, developer-only |
+| **Wallet QR** | No amount, no description, no confirmation |
 
-**Die Lücke:** Es gibt kein einfaches, datenschutzkonformes Tool für Freelancer,
-kleine Händler und Creator, das ohne Setup funktioniert und trotzdem
-Zahlungsbestätigung ermöglicht.
+**The gap:** There's no simple, privacy-respecting tool for freelancers, small merchants, and creators that works without setup and still allows payment confirmation.
 
 ---
 
-## Technologie-Stack
+## Features
+
+### Invoice Generation
+- XMR address input with validation (standard, subaddress, integrated)
+- Amount in XMR or fiat (EUR/CHF/USD conversion via CoinGecko)
+- Description and payment deadline (7/14/30 days or custom)
+- QR code with `monero:` URI
+- Shareable short URLs (`/s/abc123`)
+- PDF invoice download (with QR, amount, fiat equivalent, deadline)
+- i18n (English, German) with automatic browser detection
+
+### Payment Verification (TX Proof)
+- Sender provides TX Hash + TX Key from their wallet
+- Cryptographic verification in the browser (no private keys needed)
+- Payment status stored permanently with the invoice
+- Invoice link shows "Paid" badge after verification
+- Standard and subaddress support
+
+### Performance & Privacy
+- 100% Lighthouse score (Performance, Accessibility, Best Practices, SEO)
+- Offline-capable via Service Worker
+- Self-hosted fonts (no Google Fonts dependency)
+- Zero external tracking, no cookies
+- Dark mode, responsive design
+
+---
+
+## Tech Stack
 
 ```
-Frontend:   HTML + Vanilla JS (oder leichtes Vue 3)
-Crypto:     monero-javascript (WASM, läuft im Browser)
-Node:       Frei wählbarer öffentlicher Remote Node (z.B. xmr.sh, node.community)
-QR:         QRCode.js (clientseitig)
-PDF:        jsPDF (clientseitig)
-Hosting:    Statische Site — GitHub Pages, Netlify, Vercel, Self-hosted
-Backend:    KEINES
-Daten:      LocalStorage (optional, nur lokal, nie übertragen)
+Frontend:    HTML + Vanilla JS (no frameworks, no build step)
+Crypto:      @noble/curves Ed25519 + Keccak-256 (30KB bundle)
+QR:          QRCode.js (client-side)
+PDF:         jsPDF (client-side, lazy-loaded)
+Hosting:     Static site + minimal PHP for short URLs and RPC proxy
+Backend:     Minimal PHP (URL shortener, rates proxy, proof storage)
+Data:        JSON files (no database), LocalStorage (client-side)
 ```
 
-**Kein PHP-Backend. Kein Node.js-Server. Kein Datenbank-Setup.**
-Die App ist eine einzige HTML-Datei, die von überall gehostet werden kann.
-
 ---
 
-## Feature-Roadmap
-
-### v1 — Der Kern (Static QR Generator) ✅
-
-- [x] XMR-Adresse eingeben (Validierung: Standard, Subaddress, Integrated)
-- [x] Betrag in XMR eingeben (optional: EUR/CHF/USD-Umrechnung via CoinGecko API)
-- [x] Beschreibung / Verwendungszweck
-- [x] Optionaler Countdown-Timer (Zahlungsfrist)
-- [x] `monero:`-URI generieren
-- [x] QR-Code anzeigen und als PNG downloaden
-- [x] Link kopieren (für Messenger, E-Mail etc.)
-- [x] Teilbare Kurz-URLs (`/s/abc123`) — selbst gehostetes URL-Shortening
-- [x] Mehrsprachigkeit (DE, EN) mit automatischer Browsererkennung
-- [x] Responsive Design, Dark Mode
-- [x] Offline-fähig via Service Worker
-- [x] CoinGecko-Fallback mit Auto-Retry
-
-### v2 — TX Proof Zahlungsbestätigung ✅
-
-- [x] Sender gibt TX Hash + TX Key ein (aus Wallet kopiert)
-- [x] Kryptografische Verifizierung im Browser (30KB noble-curves Bundle)
-- [x] Zahlungsstatus wird dauerhaft mit Rechnung gespeichert
-- [x] Rechnungs-Link zeigt "Bezahlt" Badge nach Verifizierung
-- [x] Standard- und Subaddress-Unterstützung
-- [x] Kein Private View Key nötig — kein Privacy-Risiko
-
-### v3 — Professionelle Features
-
-- [ ] PDF-Rechnung generieren (Logo, Betrag in Fiat, XMR-Betrag, QR, Fälligkeitsdatum)
-- [ ] Einbettbarer `<iframe>`-Widget für beliebige Websites
-- [ ] Weitere Sprachen (FR, ES, ...)
-- [ ] Rechnungshistorie (LocalStorage, exportierbar als CSV)
-- [ ] „Pay Button" Generator (HTML-Snippet zum Einbetten)
-
----
-
-## Warum das zur Monero-Philosophie passt
-
-- **Zero Trust:** App läuft im Browser, kein Server sieht Daten
-- **Open Source:** MIT-Lizenz, forkbar, selbst hostbar
-- **Keine Accounts:** Nichts zu registrieren, nichts zu verlieren
-- **Kein KYC:** Weder Sender noch Empfänger müssen sich ausweisen
-- **Kein Custody:** Coins gehen direkt in die eigene Wallet
-- **Offline-fähig (v1):** QR-Generator funktioniert ohne Internetverbindung
-
----
-
-## Abgrenzung zu bestehenden Tools
-
-**Kein Konkurrenz zu BTCPay:** BTCPay ist für Shops mit hohem Volumen.
-xmrpay.link ist für Einzelpersonen, Freelancer, Aktivisten — alle, die
-schnell und ohne Overhead eine Zahlung anfragen wollen.
-
-**Kein Konkurrenz zu Wallets:** Wallets bleiben die primäre Lösung
-für den täglichen Gebrauch. xmrpay.link ergänzt mit Teil- und Präsentationslogik
-(PDF, Link, Timer), die Wallets nicht bieten.
-
----
-
-## Sicherheitshinweise (für Nutzer)
-
-- Der **Spend-Key verlässt nie den Browser** — nur View-Key wird für Monitoring verwendet
-- Remote Node sieht nur: "Wurde an diese Adresse gezahlt?" — keine Wallet-Zuordnung
-- Für maximale Privatsphäre: eigenen Node via Tor verbinden (konfigurierbar)
-- LocalStorage-Daten bleiben lokal — nichts wird übertragen
-
----
-
-## Mögliche Domain-Namen
-
-| Domain | Begründung |
-|---|---|
-| `xmrpay.link` | ⭐ Kurz, klar, `monero:` URI passt dazu, TLD `.link` passt perfekt |
-| `xmr.invoice` | Elegant, aber `.invoice` TLD existiert nicht |
-| `payxmr.dev` | Developer-affin, gut für GitHub-Kontext |
-| `xmrbill.com` | Einprägsam, beschreibend |
-| `monero.page` | Sauber, aber evtl. zu generisch |
-| `xmrlink.io` | Klar, crypto-affine TLD |
-
-**Empfehlung: `xmrpay.link`** — weil der Name sofort sagt was die App tut,
-`.link` auf den Share-Gedanken einzahlt, und der Name kurz genug ist
-um ihn mündlich weiterzugeben.
-
----
-
-## Projektstruktur (geplant)
+## Project Structure
 
 ```
 xmrpay.link/
-├── index.html          # Single-Page-App Entry Point
-├── app.js              # Haupt-Logik (URI-Builder, QR, Fiat-Kurs, Short-URLs)
-├── i18n.js             # Mehrsprachigkeit (DE, EN)
-├── style.css           # Dark Theme, Responsive
-├── sw.js               # Service Worker (Offline-Fähigkeit)
-├── s.php               # Kurz-URL Redirect
+├── index.html              # Single-page app
+├── app.js / app.min.js     # Main logic (URI builder, QR, fiat rates, TX proof)
+├── i18n.js / i18n.min.js   # Internationalization (DE, EN)
+├── style.css               # Dark theme, responsive, WCAG AA
+├── sw.js                   # Service Worker (offline support)
+├── favicon.svg             # Monero coin logo
+├── s.php                   # Short URL redirect
 ├── api/
-│   └── shorten.php     # Kurz-URL Erstellung
-├── data/               # Kurz-URL Speicher (JSON, auto-generiert)
+│   ├── shorten.php         # Short URL creation
+│   ├── rates.php           # CoinGecko proxy with server-side cache
+│   ├── node.php            # Monero RPC proxy (4-node failover)
+│   └── verify.php          # TX proof storage/retrieval
+├── data/                   # JSON storage (auto-generated)
+├── fonts/                  # Self-hosted Inter + JetBrains Mono
 ├── lib/
-│   └── qrcode.min.js   # QR-Code Generator
+│   ├── qrcode.min.js       # QR code generator
+│   ├── jspdf.min.js        # PDF generation (lazy-loaded)
+│   └── xmr-crypto.bundle.js # Ed25519 + Keccak-256 (lazy-loaded)
 ├── README.md
-└── LICENSE             # MIT
+└── LICENSE                 # MIT
 ```
 
 ---
 
-## Beitragen / Entwickeln
+## Self-Hosting
 
 ```bash
-git clone https://github.com/DEIN-USERNAME/xmrpay.link
+git clone https://gitea.schmidt.eco/schmidt1024/xmrpay.link.git
 cd xmrpay.link
-# Keine Build-Tools nötig für v1 — einfach index.html im Browser öffnen
-# Für v2+: kleines Dev-Server-Setup empfohlen (z.B. `npx serve .`)
+# Serve with any web server that supports PHP
+# No build tools, no npm, no database required
+python3 -m http.server 8080  # For development (no PHP features)
 ```
 
-Pull Requests willkommen. Issues auf GitHub. Kein Discord, kein Slack —
-das Repo ist die Kommunikation.
+Requirements for full functionality:
+- PHP 8.x with `curl` extension
+- Nginx or Apache (for `/s/` short URL rewrites)
+- Writable `data/` directory
 
 ---
 
-## Lizenz
+## Security
+
+- **No private keys** — TX proof uses the sender's TX key, not the receiver's view key
+- **Client-side crypto** — Ed25519 verification runs in the browser
+- **No tracking** — zero cookies, no analytics, no external scripts
+- **RPC proxy** — allowlisted methods only, rate-limited
+- **Self-hostable** — run your own instance for full control
+
+---
+
+## Roadmap
+
+- [ ] Embeddable `<iframe>` payment widget
+- [ ] Additional languages (FR, ES, ...)
+- [ ] Invoice history (LocalStorage, CSV export)
+- [ ] "Pay Button" generator (HTML snippet)
+
+---
+
+## License
 
 MIT — fork it, host it, improve it.
-
----
-
-*Gebaut mit ❤️ für die Monero-Community. Inspiriert von [monero.eco](https://monero.eco).*

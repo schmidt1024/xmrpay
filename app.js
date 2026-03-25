@@ -570,7 +570,7 @@
     if (xmrAmount) {
       var amountStr = xmrAmount.toFixed(8) + ' XMR';
       if (currency !== 'XMR' && amount) {
-        amountStr += '  (\u2248 ' + amount.toFixed(2) + ' ' + currency + ')';
+        amountStr += '  (~ ' + amount.toFixed(2) + ' ' + currency + ')';
       }
       addField(I18n.t('pdf_amount'), amountStr);
     }

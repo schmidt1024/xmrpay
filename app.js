@@ -38,19 +38,14 @@
   const newRequestBtn = $('#newRequest');
   const homeLink = $('#homeLink');
 
-  // Monitor DOM
-  const monitorSection = $('#monitorSection');
-  const monitorToggle = $('#monitorToggle');
-  const monitorPanel = $('#monitorPanel');
-  const viewKeyInput = $('#viewKey');
-  const startMonitorBtn = $('#startMonitor');
-  const stopMonitorBtn = $('#stopMonitor');
-  const monitorStatus = $('#monitorStatus');
-  const statusIndicator = $('#statusIndicator');
-  const statusText = $('#statusText');
-  const confirmationsBar = $('#confirmationsBar');
-  const confirmationsFill = $('#confirmationsFill');
-  const confirmationsText = $('#confirmationsText');
+  // TX Proof DOM
+  const proofToggle = $('#proofToggle');
+  const proofPanel = $('#proofPanel');
+  const txHashInput = $('#txHash');
+  const txKeyInput = $('#txKey');
+  const verifyProofBtn = $('#verifyProof');
+  const proofResult = $('#proofResult');
+  const paymentStatus = $('#paymentStatus');
   let cryptoLoaded = false;
 
   // --- Init ---
@@ -90,11 +85,11 @@
     selectedDays = parseInt(timerCustom.value) || 0;
   });
 
-  // Monitor events
-  monitorToggle.addEventListener('click', toggleMonitor);
-  viewKeyInput.addEventListener('input', validateViewKey);
-  startMonitorBtn.addEventListener('click', startMonitoring);
-  stopMonitorBtn.addEventListener('click', stopMonitoring);
+  // TX Proof events
+  proofToggle.addEventListener('click', toggleProofPanel);
+  txHashInput.addEventListener('input', validateProofInputs);
+  txKeyInput.addEventListener('input', validateProofInputs);
+  verifyProofBtn.addEventListener('click', verifyTxProof);
 
   // --- Functions ---
 
@@ -115,12 +110,15 @@
     qrContainer.innerHTML = '';
     uriBox.textContent = '';
     shareLinkInput.value = '';
-    // Reset monitor
-    stopMonitoring();
-    monitorPanel.classList.remove('open');
-    viewKeyInput.value = '';
-    viewKeyInput.classList.remove('valid', 'invalid');
-    startMonitorBtn.disabled = true;
+    // Reset proof
+    proofPanel.classList.remove('open');
+    txHashInput.value = '';
+    txKeyInput.value = '';
+    verifyProofBtn.disabled = true;
+    proofResult.innerHTML = '';
+    proofResult.className = 'proof-result';
+    paymentStatus.innerHTML = '';
+    paymentStatus.className = 'payment-status';
     history.replaceState(null, '', location.pathname);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     addrInput.focus();
@@ -308,6 +306,12 @@
       }
     }
 
+    // Check for short URL code and load payment status
+    const code = params.get('c');
+    if (code) {
+      setTimeout(function () { loadPaymentStatus(code); }, 200);
+    }
+
     // Auto-generate
     setTimeout(generate, 100);
     return true;
@@ -413,134 +417,160 @@
     }
   }
 
-  // --- Monitor Functions (v2) ---
+  // --- TX Proof Functions ---
 
-  function toggleMonitor() {
-    const panel = monitorPanel;
-    const isOpen = panel.classList.contains('open');
+  function toggleProofPanel() {
+    const isOpen = proofPanel.classList.contains('open');
     if (isOpen) {
-      panel.classList.remove('open');
+      proofPanel.classList.remove('open');
       return;
     }
     // Lazy-load crypto bundle
     if (!cryptoLoaded && !window.XmrCrypto) {
       loadCryptoBundle().then(function () {
         cryptoLoaded = true;
-        panel.classList.add('open');
-        viewKeyInput.focus();
+        proofPanel.classList.add('open');
+        txHashInput.focus();
       });
       return;
     }
-    panel.classList.add('open');
-    viewKeyInput.focus();
+    proofPanel.classList.add('open');
+    txHashInput.focus();
   }
 
   function loadCryptoBundle() {
     return new Promise(function (resolve, reject) {
       if (window.XmrCrypto) { resolve(); return; }
-      statusText.textContent = I18n.t('monitor_loading');
-      monitorStatus.classList.add('active');
       const script = document.createElement('script');
       script.src = 'lib/xmr-crypto.bundle.js';
-      script.onload = function () {
-        monitorStatus.classList.remove('active');
-        resolve();
-      };
-      script.onerror = function () {
-        monitorStatus.classList.remove('active');
-        reject(new Error('Failed to load crypto module'));
-      };
+      script.onload = resolve;
+      script.onerror = function () { reject(new Error('Failed to load crypto module')); };
       document.head.appendChild(script);
     });
   }
 
-  function validateViewKey() {
-    const key = viewKeyInput.value.trim();
-    viewKeyInput.classList.remove('valid', 'invalid');
-    if (key.length === 0) {
-      startMonitorBtn.disabled = true;
-      return;
-    }
-    if (PaymentMonitor.isValidViewKey(key)) {
-      viewKeyInput.classList.add('valid');
-      startMonitorBtn.disabled = false;
-    } else if (key.length >= 10) {
-      viewKeyInput.classList.add('invalid');
-      startMonitorBtn.disabled = true;
-    }
+  function isValidHex64(val) {
+    return /^[0-9a-fA-F]{64}$/.test(val);
   }
 
-  function startMonitoring() {
-    const viewKey = viewKeyInput.value.trim();
-    if (!PaymentMonitor.isValidViewKey(viewKey)) return;
+  function validateProofInputs() {
+    const hash = txHashInput.value.trim();
+    const key = txKeyInput.value.trim();
+    verifyProofBtn.disabled = !(isValidHex64(hash) && isValidHex64(key));
+  }
 
+  async function verifyTxProof() {
+    const txHash = txHashInput.value.trim();
+    const txKey = txKeyInput.value.trim();
     const addr = addrInput.value.trim();
-    const xmrAmount = getXmrAmount() || 0;
+    if (!isValidHex64(txHash) || !isValidHex64(txKey) || !isValidAddress(addr)) return;
 
-    // Hide input, show status
-    startMonitorBtn.style.display = 'none';
-    viewKeyInput.closest('.field').style.display = 'none';
-    monitorStatus.classList.add('active');
-    stopMonitorBtn.classList.add('active');
+    verifyProofBtn.disabled = true;
+    proofResult.className = 'proof-result active';
+    proofResult.textContent = I18n.t('proof_verifying');
 
-    PaymentMonitor.start(addr, viewKey, xmrAmount, function (newState, data) {
-      updateMonitorUI(newState, data);
-    });
-  }
+    try {
+      // Fetch TX from node
+      var res = await fetch('/api/node.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: 'gettransactions', params: { txs_hashes: [txHash], decode_as_json: true } })
+      });
+      var data = await res.json();
+      var txs = data.txs || [];
+      if (txs.length === 0) {
+        proofResult.className = 'proof-result active error';
+        proofResult.textContent = I18n.t('proof_tx_not_found');
+        verifyProofBtn.disabled = false;
+        return;
+      }
 
-  function stopMonitoring() {
-    PaymentMonitor.stop();
-    monitorStatus.classList.remove('active');
-    confirmationsBar.classList.remove('active');
-    stopMonitorBtn.classList.remove('active');
-    startMonitorBtn.style.display = '';
-    viewKeyInput.closest('.field').style.display = '';
-    statusIndicator.className = 'status-indicator';
-    statusText.textContent = '';
-  }
+      var tx = txs[0];
+      var txJson = JSON.parse(tx.as_json);
 
-  function updateMonitorUI(monitorState, data) {
-    const S = PaymentMonitor.STATE;
-    statusIndicator.className = 'status-indicator ' + monitorState;
+      // Get keys from address
+      var keys = XmrCrypto.getKeysFromAddress(addr);
+      var pubViewKey = keys.publicViewKey;
+      var pubSpendKey = keys.publicSpendKey;
 
-    switch (monitorState) {
-      case S.CONNECTING:
-        statusText.textContent = I18n.t('monitor_connecting');
-        confirmationsBar.classList.remove('active');
-        break;
-      case S.SCANNING:
-        statusText.textContent = I18n.t('monitor_scanning');
-        break;
-      case S.WAITING:
-        statusText.textContent = I18n.t('monitor_waiting');
-        break;
-      case S.MEMPOOL:
-        statusText.textContent = I18n.t('monitor_mempool');
-        showConfirmations(data.confirmations);
-        break;
-      case S.CONFIRMED:
-        statusText.textContent = I18n.t('monitor_confirmed');
-        showConfirmations(data.confirmations);
-        stopMonitorBtn.classList.remove('active');
-        break;
-      case S.UNDERPAID:
-        statusText.textContent = I18n.t('monitor_underpaid');
-        var detail = I18n.t('monitor_underpaid_detail')
-          .replace('{expected}', data.expected.toFixed(6))
-          .replace('{received}', data.received.toFixed(6));
-        statusText.textContent += '\n' + detail;
-        showConfirmations(data.confirmations);
-        break;
-      case S.ERROR:
-        statusText.textContent = data.message || I18n.t('monitor_node_error');
-        break;
+      // Key derivation: D = 8 * txKey * pubViewKey
+      var r = XmrCrypto.bytesToScalar(XmrCrypto.hexToBytes(txKey));
+      var A = XmrCrypto.Point.fromHex(pubViewKey);
+      var D = A.multiply(r).multiply(8n);
+      var derivation = D.toBytes();
+
+      var B = XmrCrypto.Point.fromHex(pubSpendKey);
+
+      // Check each output
+      var outputs = txJson.vout || [];
+      var ecdhInfo = (txJson.rct_signatures && txJson.rct_signatures.ecdhInfo) || [];
+      var totalAmount = 0n;
+      var found = false;
+
+      for (var oi = 0; oi < outputs.length; oi++) {
+        var out = outputs[oi];
+        var outputKey = out.target && out.target.tagged_key ? out.target.tagged_key.key : (out.target && out.target.key);
+        if (!outputKey) continue;
+
+        var varint = XmrCrypto.encodeVarint(oi);
+        var scalar = XmrCrypto.hashToScalar(XmrCrypto.concat(derivation, varint));
+        var scBig = XmrCrypto.bytesToScalar(scalar);
+        var expectedP = XmrCrypto.Point.BASE.multiply(scBig).add(B);
+        var expectedHex = XmrCrypto.bytesToHex(expectedP.toBytes());
+
+        if (expectedHex === outputKey) {
+          found = true;
+          // Decode amount
+          if (ecdhInfo[oi] && ecdhInfo[oi].amount) {
+            var amount = XmrCrypto.decodeRctAmount(ecdhInfo[oi].amount, derivation, oi);
+            totalAmount += amount;
+          }
+        }
+      }
+
+      if (found) {
+        var xmrAmount = Number(totalAmount) / 1e12;
+        proofResult.className = 'proof-result active success';
+        proofResult.textContent = I18n.t('proof_verified').replace('{amount}', xmrAmount.toFixed(6));
+
+        // Store proof with invoice
+        var shareUrl = shareLinkInput.value;
+        var codeMatch = shareUrl.match(/\/s\/([a-z0-9]+)/);
+        if (codeMatch) {
+          await fetch('/api/verify.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              code: codeMatch[1],
+              tx_hash: txHash,
+              amount: xmrAmount,
+              confirmations: tx.confirmations || 0
+            })
+          });
+        }
+      } else {
+        proofResult.className = 'proof-result active error';
+        proofResult.textContent = I18n.t('proof_no_match');
+      }
+    } catch (e) {
+      proofResult.className = 'proof-result active error';
+      proofResult.textContent = I18n.t('proof_error');
     }
+    verifyProofBtn.disabled = false;
   }
 
-  function showConfirmations(n) {
-    confirmationsBar.classList.add('active');
-    var pct = Math.min(100, (n / 10) * 100);
-    confirmationsFill.style.width = pct + '%';
-    confirmationsText.textContent = I18n.t('monitor_confirmations').replace('{n}', n);
+  // Load payment status if viewing via short URL
+  function loadPaymentStatus(code) {
+    fetch('/api/verify.php?code=' + encodeURIComponent(code))
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.verified) {
+          paymentStatus.className = 'payment-status paid';
+          paymentStatus.innerHTML = '<div class="paid-badge">' + I18n.t('status_paid') +
+            '</div><div class="paid-detail">' + data.amount.toFixed(6) + ' XMR — TX ' +
+            data.tx_hash.substring(0, 8) + '...</div>';
+        }
+      })
+      .catch(function () {});
   }
 })();

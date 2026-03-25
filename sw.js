@@ -1,10 +1,9 @@
-var CACHE_NAME = 'xmrpay-v2';
+var CACHE_NAME = 'xmrpay-v3';
 var ASSETS = [
   '/',
   '/index.html',
   '/app.js',
   '/i18n.js',
-  '/monitor.js',
   '/style.css',
   '/lib/qrcode.min.js'
   // xmr-crypto.bundle.js is lazy-loaded and runtime-cached

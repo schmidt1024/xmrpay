@@ -67,15 +67,14 @@ Die App ist eine einzige HTML-Datei, die von überall gehostet werden kann.
 - [x] Offline-fähig via Service Worker
 - [x] CoinGecko-Fallback mit Auto-Retry
 
-### v2 — View-Key Zahlungsbestätigung (Browser-basiert) ✅
+### v2 — TX Proof Zahlungsbestätigung ✅
 
-- [x] Private View-Key eingeben (validiert gegen Adresse, verlässt nie den Browser)
-- [x] Browser pollt Remote Node via PHP-Proxy mit Failover (4 Nodes)
-- [x] Live-Anzeige: "Warte auf Zahlung..." → "Zahlung eingegangen (X/10 Bestätigungen)"
-- [x] Fortschrittsbalken für Bestätigungen
-- [x] Unterzahlungs-Erkennung
+- [x] Sender gibt TX Hash + TX Key ein (aus Wallet kopiert)
+- [x] Kryptografische Verifizierung im Browser (30KB noble-curves Bundle)
+- [x] Zahlungsstatus wird dauerhaft mit Rechnung gespeichert
+- [x] Rechnungs-Link zeigt "Bezahlt" Badge nach Verifizierung
 - [x] Standard- und Subaddress-Unterstützung
-- [x] Leichtgewichtige Krypto (30KB noble-curves Bundle, kein 5MB WASM)
+- [x] Kein Private View Key nötig — kein Privacy-Risiko
 
 ### v3 — Professionelle Features
 

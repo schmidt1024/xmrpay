@@ -407,9 +407,9 @@ textarea {
   flex: 1;
 }
 
-/* --- Monitor Section --- */
+/* --- TX Proof Section --- */
 
-.monitor-section {
+.proof-section {
   margin-top: 1rem;
   border-top: 1px solid var(--border);
   padding-top: 0.8rem;
@@ -438,123 +438,64 @@ textarea {
   color: var(--text);
 }
 
-.monitor-panel {
+.proof-panel {
   display: none;
   margin-top: 0.8rem;
 }
 
-.monitor-panel.open {
+.proof-panel.open {
   display: block;
 }
 
-.mono-masked {
-  -webkit-text-security: disc;
-}
-
-.view-key-hint {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  margin-top: 0.25rem;
-  font-style: italic;
-}
-
-.monitor-status {
+.proof-result {
   display: none;
   text-align: center;
-  padding: 1rem 0;
+  padding: 0.8rem;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  margin-top: 0.8rem;
 }
 
-.monitor-status.active {
+.proof-result.active {
   display: block;
 }
 
-.status-indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin: 0 auto 0.5rem;
-  background: var(--text-muted);
+.proof-result.success {
+  background: rgba(76, 175, 80, 0.15);
+  color: var(--success);
+  border: 1px solid var(--success);
 }
 
-.status-indicator.connecting,
-.status-indicator.scanning {
-  background: var(--accent);
-  animation: pulse 1.5s ease-in-out infinite;
+.proof-result.error {
+  background: rgba(244, 67, 54, 0.15);
+  color: var(--error);
+  border: 1px solid var(--error);
 }
 
-.status-indicator.waiting {
-  background: var(--accent);
-  animation: pulse 2s ease-in-out infinite;
+.payment-status {
+  display: none;
 }
 
-.status-indicator.mempool {
-  background: #ffc107;
-  animation: pulse 1s ease-in-out infinite;
+.payment-status.paid {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
 }
 
-.status-indicator.confirmed {
+.paid-badge {
+  display: inline-block;
   background: var(--success);
-  animation: none;
-}
-
-.status-indicator.underpaid {
-  background: var(--error);
-  animation: pulse 1s ease-in-out infinite;
-}
-
-.status-indicator.error {
-  background: var(--error);
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.2); }
-}
-
-.status-text {
-  font-size: 0.9rem;
-  color: var(--text);
-  margin-bottom: 0.5rem;
-}
-
-.confirmations-bar {
-  display: none;
-  position: relative;
-  height: 24px;
-  background: var(--bg-input);
+  color: #fff;
+  padding: 0.4rem 1.2rem;
   border-radius: var(--radius);
-  overflow: hidden;
-  margin-bottom: 0.8rem;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
 }
 
-.confirmations-bar.active {
-  display: block;
-}
-
-.confirmations-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--success));
-  border-radius: var(--radius);
-  transition: width 0.5s ease;
-  width: 0%;
-}
-
-.confirmations-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.paid-detail {
   font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-#stopMonitor {
-  display: none;
-}
-
-#stopMonitor.active {
-  display: block;
+  color: var(--text-muted);
 }
 
 .btn-new {

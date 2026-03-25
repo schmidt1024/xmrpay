@@ -73,33 +73,31 @@
         <a class="btn btn-secondary" id="openWallet" href="#" data-i18n="btn_open_wallet"></a>
         <button class="btn btn-secondary" id="copyAddr" data-i18n="btn_copy_addr"></button>
       </div>
-      <!-- Payment Monitor (v2) -->
-      <div class="monitor-section" id="monitorSection">
-        <button class="btn btn-monitor" id="monitorToggle">
+      <!-- TX Proof Verification -->
+      <div class="proof-section" id="proofSection">
+        <button class="btn btn-monitor" id="proofToggle">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
           </svg>
-          <span data-i18n="btn_monitor"></span>
+          <span data-i18n="btn_prove_payment"></span>
         </button>
-        <div class="monitor-panel" id="monitorPanel">
+        <div class="proof-panel" id="proofPanel">
           <div class="field">
-            <label for="viewKey" data-i18n="label_view_key"></label>
-            <input type="text" id="viewKey" data-i18n-placeholder="placeholder_view_key" spellcheck="false" autocomplete="off" class="mono-masked">
-            <div class="view-key-hint" data-i18n="hint_view_key"></div>
+            <label for="txHash" data-i18n="label_tx_hash"></label>
+            <input type="text" id="txHash" data-i18n-placeholder="placeholder_tx_hash" spellcheck="false" autocomplete="off">
           </div>
-          <button class="btn btn-primary" id="startMonitor" disabled data-i18n="btn_start_monitor"></button>
-          <div class="monitor-status" id="monitorStatus">
-            <div class="status-indicator" id="statusIndicator"></div>
-            <div class="status-text" id="statusText"></div>
-            <div class="confirmations-bar" id="confirmationsBar">
-              <div class="confirmations-fill" id="confirmationsFill"></div>
-              <span class="confirmations-text" id="confirmationsText"></span>
-            </div>
+          <div class="field">
+            <label for="txKey" data-i18n="label_tx_key"></label>
+            <input type="text" id="txKey" data-i18n-placeholder="placeholder_tx_key" spellcheck="false" autocomplete="off">
           </div>
-          <button class="btn btn-secondary" id="stopMonitor" data-i18n="btn_stop_monitor"></button>
+          <button class="btn btn-primary" id="verifyProof" disabled data-i18n="btn_verify_proof"></button>
+          <div class="proof-result" id="proofResult"></div>
         </div>
       </div>
+
+      <!-- Payment status (shown when proof is stored) -->
+      <div class="payment-status" id="paymentStatus"></div>
 
       <button class="btn btn-primary btn-new" id="newRequest" data-i18n="btn_new_request"></button>
     </div>
@@ -126,6 +124,5 @@
   <script src="lib/qrcode.min.js"></script>
   <script src="i18n.js"></script>
   <script src="app.js"></script>
-  <script src="monitor.js"></script>
 </body>
 </html>

@@ -35,8 +35,8 @@ self.addEventListener('activate', function (e) {
 self.addEventListener('fetch', function (e) {
   var url = new URL(e.request.url);
 
-  // External APIs and RPC proxy — network only, don't cache
-  if (url.hostname !== location.hostname || url.pathname.startsWith('/api/')) {
+  // API calls — network only, don't cache
+  if (url.pathname.startsWith('/api/')) {
     e.respondWith(fetch(e.request));
     return;
   }

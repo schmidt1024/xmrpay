@@ -23,8 +23,9 @@
   --border: #333;
   --text: #e0e0e0;
   --text-muted: #888;
-  --accent: #ff6600;
-  --accent-hover: #ff8533;
+  --accent: #c74a00;
+  --accent-hover: #a83f00;
+  --accent-text: #e87830;
   --success: #4caf50;
   --error: #f44336;
   --radius: 8px;
@@ -54,7 +55,7 @@ header {
 }
 
 .lang-picker {
-  position: fixed;
+  position: absolute;
   top: 0.75rem;
   right: 0.75rem;
   z-index: 50;
@@ -119,7 +120,7 @@ header {
 }
 
 .lang-option.active {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 header h1 {
@@ -138,7 +139,7 @@ header h1 a:hover {
 }
 
 header h1 span {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 header p {
@@ -590,8 +591,8 @@ textarea {
 .btn-new {
   margin-top: 0.8rem;
   background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
+  border: 1px solid var(--accent-text);
+  color: var(--accent-text);
 }
 
 .btn-new:hover {
@@ -628,7 +629,7 @@ footer {
 }
 
 footer a {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
 }
 
@@ -644,7 +645,7 @@ footer a {
 }
 
 .countdown.active {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 @media (max-width: 500px) {

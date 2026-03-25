@@ -67,13 +67,15 @@ Die App ist eine einzige HTML-Datei, die von überall gehostet werden kann.
 - [x] Offline-fähig via Service Worker
 - [x] CoinGecko-Fallback mit Auto-Retry
 
-### v2 — View-Key Zahlungsbestätigung (Browser-basiert)
+### v2 — View-Key Zahlungsbestätigung (Browser-basiert) ✅
 
-- [ ] View-Only-Key eingeben (privater Spend-Key bleibt lokal)
-- [ ] Browser pollt Remote Node via Monero RPC (kein eigener Node nötig)
-- [ ] Live-Anzeige: "Warte auf Zahlung..." → "✅ Zahlung eingegangen (X Bestätigungen)"
-- [ ] Warnhinweis bei Unterzahlung
-- [ ] Subaddress-Unterstützung (für mehrere parallele Rechnungen)
+- [x] Private View-Key eingeben (validiert gegen Adresse, verlässt nie den Browser)
+- [x] Browser pollt Remote Node via PHP-Proxy mit Failover (4 Nodes)
+- [x] Live-Anzeige: "Warte auf Zahlung..." → "Zahlung eingegangen (X/10 Bestätigungen)"
+- [x] Fortschrittsbalken für Bestätigungen
+- [x] Unterzahlungs-Erkennung
+- [x] Standard- und Subaddress-Unterstützung
+- [x] Leichtgewichtige Krypto (30KB noble-curves Bundle, kein 5MB WASM)
 
 ### v3 — Professionelle Features
 

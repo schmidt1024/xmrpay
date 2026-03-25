@@ -21,7 +21,9 @@
   const amountInput = $('#amount');
   const currencySelect = $('#currency');
   const descInput = $('#desc');
-  const timerInput = $('#timer');
+  const timerCustom = $('#timerCustom');
+  const deadlineBadges = $('#deadlineBadges');
+  let selectedDays = 0;
   const generateBtn = $('#generate');
   const resultSection = $('#result');
   const qrContainer = $('#qr');
@@ -35,6 +37,21 @@
   const copyShareLinkBtn = $('#copyShareLink');
   const newRequestBtn = $('#newRequest');
   const homeLink = $('#homeLink');
+
+  // Monitor DOM
+  const monitorSection = $('#monitorSection');
+  const monitorToggle = $('#monitorToggle');
+  const monitorPanel = $('#monitorPanel');
+  const viewKeyInput = $('#viewKey');
+  const startMonitorBtn = $('#startMonitor');
+  const stopMonitorBtn = $('#stopMonitor');
+  const monitorStatus = $('#monitorStatus');
+  const statusIndicator = $('#statusIndicator');
+  const statusText = $('#statusText');
+  const confirmationsBar = $('#confirmationsBar');
+  const confirmationsFill = $('#confirmationsFill');
+  const confirmationsText = $('#confirmationsText');
+  let cryptoLoaded = false;
 
   // --- Init ---
   fetchRates();
@@ -52,6 +69,33 @@
   newRequestBtn.addEventListener('click', resetForm);
   homeLink.addEventListener('click', function (e) { e.preventDefault(); resetForm(); });
 
+  // Deadline badge events
+  deadlineBadges.querySelectorAll('.badge').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const days = parseInt(btn.getAttribute('data-days'));
+      if (btn.classList.contains('active')) {
+        btn.classList.remove('active');
+        selectedDays = 0;
+        timerCustom.value = '';
+      } else {
+        deadlineBadges.querySelectorAll('.badge').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        selectedDays = days;
+        timerCustom.value = '';
+      }
+    });
+  });
+  timerCustom.addEventListener('input', function () {
+    deadlineBadges.querySelectorAll('.badge').forEach(function (b) { b.classList.remove('active'); });
+    selectedDays = parseInt(timerCustom.value) || 0;
+  });
+
+  // Monitor events
+  monitorToggle.addEventListener('click', toggleMonitor);
+  viewKeyInput.addEventListener('input', validateViewKey);
+  startMonitorBtn.addEventListener('click', startMonitoring);
+  stopMonitorBtn.addEventListener('click', stopMonitoring);
+
   // --- Functions ---
 
   function resetForm() {
@@ -59,7 +103,9 @@
     amountInput.value = '';
     currencySelect.value = 'EUR';
     descInput.value = '';
-    timerInput.value = '';
+    selectedDays = 0;
+    timerCustom.value = '';
+    deadlineBadges.querySelectorAll('.badge').forEach(function (b) { b.classList.remove('active'); });
     fiatHint.textContent = '';
     fiatHint.classList.remove('error');
     addrInput.classList.remove('valid', 'invalid');
@@ -69,6 +115,12 @@
     qrContainer.innerHTML = '';
     uriBox.textContent = '';
     shareLinkInput.value = '';
+    // Reset monitor
+    stopMonitoring();
+    monitorPanel.classList.remove('open');
+    viewKeyInput.value = '';
+    viewKeyInput.classList.remove('valid', 'invalid');
+    startMonitorBtn.disabled = true;
     history.replaceState(null, '', location.pathname);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     addrInput.focus();
@@ -184,7 +236,7 @@
 
     const xmrAmount = getXmrAmount();
     const desc = descInput.value.trim();
-    const timer = parseInt(timerInput.value) || 0;
+    const timer = selectedDays;
     const uri = buildUri(addr, xmrAmount, desc);
 
     // Show result
@@ -205,8 +257,8 @@
       text: uri,
       width: 256,
       height: 256,
-      colorDark: '#ffffff',
-      colorLight: '#1a1a1a',
+      colorDark: '#000000',
+      colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.M
     });
     const hint = document.createElement('div');
@@ -245,7 +297,16 @@
     if (desc) descInput.value = desc;
 
     const timer = params.get('t');
-    if (timer && parseInt(timer) > 0) timerInput.value = timer;
+    if (timer && parseInt(timer) > 0) {
+      selectedDays = parseInt(timer);
+      // Activate matching badge or set custom
+      const badge = deadlineBadges.querySelector('.badge[data-days="' + selectedDays + '"]');
+      if (badge) {
+        badge.classList.add('active');
+      } else {
+        timerCustom.value = selectedDays;
+      }
+    }
 
     // Auto-generate
     setTimeout(generate, 100);
@@ -257,10 +318,9 @@
     countdownEl.textContent = '';
     countdownEl.className = 'countdown';
 
-    const minutes = parseInt(timerInput.value);
-    if (!minutes || minutes <= 0) return;
+    if (!selectedDays || selectedDays <= 0) return;
 
-    const end = Date.now() + minutes * 60000;
+    const end = Date.now() + selectedDays * 86400000;
     countdownEl.classList.add('active');
 
     function tick() {
@@ -271,9 +331,17 @@
         countdownEl.className = 'countdown expired';
         return;
       }
-      const m = Math.floor(remaining / 60000);
+      const d = Math.floor(remaining / 86400000);
+      const h = Math.floor((remaining % 86400000) / 3600000);
+      const m = Math.floor((remaining % 3600000) / 60000);
       const s = Math.floor((remaining % 60000) / 1000);
-      countdownEl.textContent = I18n.t('countdown_remaining') + pad(m) + ':' + pad(s);
+      if (d > 0) {
+        countdownEl.textContent = I18n.t('countdown_remaining_days')
+          .replace('{d}', d).replace('{h}', pad(h)).replace('{m}', pad(m)).replace('{s}', pad(s));
+      } else {
+        countdownEl.textContent = I18n.t('countdown_remaining_hours')
+          .replace('{h}', pad(h)).replace('{m}', pad(m)).replace('{s}', pad(s));
+      }
     }
 
     tick();
@@ -343,5 +411,136 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function () {});
     }
+  }
+
+  // --- Monitor Functions (v2) ---
+
+  function toggleMonitor() {
+    const panel = monitorPanel;
+    const isOpen = panel.classList.contains('open');
+    if (isOpen) {
+      panel.classList.remove('open');
+      return;
+    }
+    // Lazy-load crypto bundle
+    if (!cryptoLoaded && !window.XmrCrypto) {
+      loadCryptoBundle().then(function () {
+        cryptoLoaded = true;
+        panel.classList.add('open');
+        viewKeyInput.focus();
+      });
+      return;
+    }
+    panel.classList.add('open');
+    viewKeyInput.focus();
+  }
+
+  function loadCryptoBundle() {
+    return new Promise(function (resolve, reject) {
+      if (window.XmrCrypto) { resolve(); return; }
+      statusText.textContent = I18n.t('monitor_loading');
+      monitorStatus.classList.add('active');
+      const script = document.createElement('script');
+      script.src = 'lib/xmr-crypto.bundle.js';
+      script.onload = function () {
+        monitorStatus.classList.remove('active');
+        resolve();
+      };
+      script.onerror = function () {
+        monitorStatus.classList.remove('active');
+        reject(new Error('Failed to load crypto module'));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  function validateViewKey() {
+    const key = viewKeyInput.value.trim();
+    viewKeyInput.classList.remove('valid', 'invalid');
+    if (key.length === 0) {
+      startMonitorBtn.disabled = true;
+      return;
+    }
+    if (PaymentMonitor.isValidViewKey(key)) {
+      viewKeyInput.classList.add('valid');
+      startMonitorBtn.disabled = false;
+    } else if (key.length >= 10) {
+      viewKeyInput.classList.add('invalid');
+      startMonitorBtn.disabled = true;
+    }
+  }
+
+  function startMonitoring() {
+    const viewKey = viewKeyInput.value.trim();
+    if (!PaymentMonitor.isValidViewKey(viewKey)) return;
+
+    const addr = addrInput.value.trim();
+    const xmrAmount = getXmrAmount() || 0;
+
+    // Hide input, show status
+    startMonitorBtn.style.display = 'none';
+    viewKeyInput.closest('.field').style.display = 'none';
+    monitorStatus.classList.add('active');
+    stopMonitorBtn.classList.add('active');
+
+    PaymentMonitor.start(addr, viewKey, xmrAmount, function (newState, data) {
+      updateMonitorUI(newState, data);
+    });
+  }
+
+  function stopMonitoring() {
+    PaymentMonitor.stop();
+    monitorStatus.classList.remove('active');
+    confirmationsBar.classList.remove('active');
+    stopMonitorBtn.classList.remove('active');
+    startMonitorBtn.style.display = '';
+    viewKeyInput.closest('.field').style.display = '';
+    statusIndicator.className = 'status-indicator';
+    statusText.textContent = '';
+  }
+
+  function updateMonitorUI(monitorState, data) {
+    const S = PaymentMonitor.STATE;
+    statusIndicator.className = 'status-indicator ' + monitorState;
+
+    switch (monitorState) {
+      case S.CONNECTING:
+        statusText.textContent = I18n.t('monitor_connecting');
+        confirmationsBar.classList.remove('active');
+        break;
+      case S.SCANNING:
+        statusText.textContent = I18n.t('monitor_scanning');
+        break;
+      case S.WAITING:
+        statusText.textContent = I18n.t('monitor_waiting');
+        break;
+      case S.MEMPOOL:
+        statusText.textContent = I18n.t('monitor_mempool');
+        showConfirmations(data.confirmations);
+        break;
+      case S.CONFIRMED:
+        statusText.textContent = I18n.t('monitor_confirmed');
+        showConfirmations(data.confirmations);
+        stopMonitorBtn.classList.remove('active');
+        break;
+      case S.UNDERPAID:
+        statusText.textContent = I18n.t('monitor_underpaid');
+        var detail = I18n.t('monitor_underpaid_detail')
+          .replace('{expected}', data.expected.toFixed(6))
+          .replace('{received}', data.received.toFixed(6));
+        statusText.textContent += '\n' + detail;
+        showConfirmations(data.confirmations);
+        break;
+      case S.ERROR:
+        statusText.textContent = data.message || I18n.t('monitor_node_error');
+        break;
+    }
+  }
+
+  function showConfirmations(n) {
+    confirmationsBar.classList.add('active');
+    var pct = Math.min(100, (n / 10) * 100);
+    confirmationsFill.style.width = pct + '%';
+    confirmationsText.textContent = I18n.t('monitor_confirmations').replace('{n}', n);
   }
 })();

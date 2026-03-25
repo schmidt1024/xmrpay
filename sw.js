@@ -1,11 +1,13 @@
-var CACHE_NAME = 'xmrpay-v1';
+var CACHE_NAME = 'xmrpay-v2';
 var ASSETS = [
   '/',
   '/index.html',
   '/app.js',
   '/i18n.js',
+  '/monitor.js',
   '/style.css',
   '/lib/qrcode.min.js'
+  // xmr-crypto.bundle.js is lazy-loaded and runtime-cached
 ];
 
 self.addEventListener('install', function (e) {
@@ -32,8 +34,8 @@ self.addEventListener('activate', function (e) {
 self.addEventListener('fetch', function (e) {
   var url = new URL(e.request.url);
 
-  // CoinGecko API — network only, don't cache
-  if (url.hostname !== location.hostname) {
+  // External APIs and RPC proxy — network only, don't cache
+  if (url.hostname !== location.hostname || url.pathname.startsWith('/api/')) {
     e.respondWith(fetch(e.request));
     return;
   }

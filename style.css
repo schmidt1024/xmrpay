@@ -236,6 +236,45 @@ input.valid {
   color: var(--error);
 }
 
+.deadline-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.45rem 0.8rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+
+.badge:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.badge.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.badge-input {
+  width: 70px;
+  padding: 0.45rem 0.5rem;
+  font-size: 0.8rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
 textarea {
   resize: vertical;
   min-height: 60px;
@@ -290,7 +329,8 @@ textarea {
 
 .qr-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   padding: 1rem 0;
 }
 
@@ -365,6 +405,156 @@ textarea {
 
 .actions .btn-secondary {
   flex: 1;
+}
+
+/* --- Monitor Section --- */
+
+.monitor-section {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.8rem;
+}
+
+.btn-monitor {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  font-family: var(--font);
+}
+
+.btn-monitor:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.monitor-panel {
+  display: none;
+  margin-top: 0.8rem;
+}
+
+.monitor-panel.open {
+  display: block;
+}
+
+.mono-masked {
+  -webkit-text-security: disc;
+}
+
+.view-key-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+.monitor-status {
+  display: none;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.monitor-status.active {
+  display: block;
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 auto 0.5rem;
+  background: var(--text-muted);
+}
+
+.status-indicator.connecting,
+.status-indicator.scanning {
+  background: var(--accent);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.status-indicator.waiting {
+  background: var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-indicator.mempool {
+  background: #ffc107;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.status-indicator.confirmed {
+  background: var(--success);
+  animation: none;
+}
+
+.status-indicator.underpaid {
+  background: var(--error);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.status-indicator.error {
+  background: var(--error);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.status-text {
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.confirmations-bar {
+  display: none;
+  position: relative;
+  height: 24px;
+  background: var(--bg-input);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 0.8rem;
+}
+
+.confirmations-bar.active {
+  display: block;
+}
+
+.confirmations-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--success));
+  border-radius: var(--radius);
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+.confirmations-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+#stopMonitor {
+  display: none;
+}
+
+#stopMonitor.active {
+  display: block;
 }
 
 .btn-new {

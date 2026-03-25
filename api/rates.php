@@ -8,7 +8,7 @@ $ch = curl_init($url);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT => 10,
-    CURLOPT_HTTPHEADER => ['Accept: application/json'],
+    CURLOPT_HTTPHEADER => ['Accept: application/json', 'User-Agent: xmrpay.link/1.0'],
 ]);
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,21 +12,21 @@
 
   <header>
     <h1><a href="/" id="homeLink">xmr<span>pay</span>.link</a></h1>
-    <p data-i18n="subtitle"></p>
+    <p data-i18n="subtitle">Monero payment request in seconds</p>
   </header>
 
   <main>
     <div class="card">
       <div class="field">
-        <label for="addr" data-i18n="label_addr"></label>
-        <input type="text" id="addr" data-i18n-placeholder="placeholder_addr" spellcheck="false" autocomplete="off">
+        <label for="addr" data-i18n="label_addr">XMR Address</label>
+        <input type="text" id="addr" data-i18n-placeholder="placeholder_addr" placeholder="4..." spellcheck="false" autocomplete="off">
       </div>
 
       <div class="field">
-        <label for="amount" data-i18n="label_amount"></label>
+        <label for="amount" data-i18n="label_amount">Amount</label>
         <div class="amount-row">
           <input type="number" id="amount" placeholder="0.00" min="0" step="any">
-          <select id="currency" data-i18n-aria="aria_currency">
+          <select id="currency" data-i18n-aria="aria_currency" aria-label="Currency">
             <option value="XMR">XMR</option>
             <option value="EUR" selected>EUR</option>
             <option value="USD">USD</option>
@@ -37,21 +37,21 @@
       </div>
 
       <div class="field">
-        <label for="desc" data-i18n="label_desc"></label>
-        <textarea id="desc" data-i18n-placeholder="placeholder_desc"></textarea>
+        <label for="desc" data-i18n="label_desc">Description (optional)</label>
+        <textarea id="desc" data-i18n-placeholder="placeholder_desc" placeholder="e.g. Invoice #42, freelance work..."></textarea>
       </div>
 
       <div class="field">
-        <label data-i18n="label_timer"></label>
+        <label data-i18n="label_timer">Payment deadline (optional)</label>
         <div class="deadline-badges" id="deadlineBadges">
-          <button type="button" class="badge" data-days="7">7 <span data-i18n="days"></span></button>
-          <button type="button" class="badge" data-days="14">14 <span data-i18n="days"></span></button>
-          <button type="button" class="badge" data-days="30">30 <span data-i18n="days"></span></button>
-          <input type="number" id="timerCustom" data-i18n-placeholder="placeholder_timer_custom" min="1" step="1" class="badge-input">
+          <button type="button" class="badge" data-days="7">7 <span data-i18n="days">days</span></button>
+          <button type="button" class="badge" data-days="14">14 <span data-i18n="days">days</span></button>
+          <button type="button" class="badge" data-days="30">30 <span data-i18n="days">days</span></button>
+          <input type="number" id="timerCustom" data-i18n-placeholder="placeholder_timer_custom" placeholder="Days" min="1" step="1" class="badge-input">
         </div>
       </div>
 
-      <button class="btn btn-primary" id="generate" disabled data-i18n="btn_generate"></button>
+      <button class="btn btn-primary" id="generate" disabled data-i18n="btn_generate">Create payment request</button>
     </div>
 
     <div id="result" class="card">
@@ -61,7 +61,7 @@
       <div class="countdown" id="countdown"></div>
       <div class="uri-box" id="uri" style="display:none"></div>
       <div class="share-link-box" id="shareLinkBox">
-        <label data-i18n="label_share_link"></label>
+        <label data-i18n="label_share_link">Shareable link</label>
         <div class="share-link-row">
           <input type="text" id="shareLink" readonly data-i18n-aria="label_share_link">
           <button class="btn btn-secondary btn-icon" id="copyShareLink" title="Copy">
@@ -70,9 +70,9 @@
         </div>
       </div>
       <div class="actions">
-        <button class="btn btn-secondary" id="openWallet" data-i18n="btn_open_wallet"></button>
-        <button class="btn btn-secondary" id="copyAddr" data-i18n="btn_copy_addr"></button>
-        <button class="btn btn-secondary" id="downloadPdf" data-i18n="btn_download_pdf"></button>
+        <button class="btn btn-secondary" id="openWallet" data-i18n="btn_open_wallet">Open in wallet</button>
+        <button class="btn btn-secondary" id="copyAddr" data-i18n="btn_copy_addr">Copy address</button>
+        <button class="btn btn-secondary" id="downloadPdf" data-i18n="btn_download_pdf">PDF Invoice</button>
       </div>
       <!-- TX Proof Verification -->
       <div class="proof-section" id="proofSection">
@@ -81,27 +81,27 @@
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
             <polyline points="22 4 12 14.01 9 11.01"/>
           </svg>
-          <span data-i18n="btn_prove_payment"></span>
+          <span data-i18n="btn_prove_payment">Prove payment</span>
         </button>
         <div class="proof-panel" id="proofPanel">
           <div class="field">
-            <label for="txHash" data-i18n="label_tx_hash"></label>
-            <input type="text" id="txHash" data-i18n-placeholder="placeholder_tx_hash" spellcheck="false" autocomplete="off">
+            <label for="txHash" data-i18n="label_tx_hash">Transaction ID (TX Hash)</label>
+            <input type="text" id="txHash" data-i18n-placeholder="placeholder_tx_hash" placeholder="64 hex characters..." spellcheck="false" autocomplete="off">
           </div>
           <div class="field">
-            <label for="txKey" data-i18n="label_tx_key"></label>
-            <input type="text" id="txKey" data-i18n-placeholder="placeholder_tx_key" spellcheck="false" autocomplete="off">
+            <label for="txKey" data-i18n="label_tx_key">Transaction Key (TX Key)</label>
+            <input type="text" id="txKey" data-i18n-placeholder="placeholder_tx_key" placeholder="64 hex characters..." spellcheck="false" autocomplete="off">
           </div>
-          <button class="btn btn-primary" id="verifyProof" disabled data-i18n="btn_verify_proof"></button>
+          <button class="btn btn-primary" id="verifyProof" disabled data-i18n="btn_verify_proof">Verify payment</button>
           <div class="proof-result" id="proofResult"></div>
         </div>
       </div>
-      <button class="btn btn-primary btn-new" id="newRequest" data-i18n="btn_new_request"></button>
+      <button class="btn btn-primary btn-new" id="newRequest" data-i18n="btn_new_request">New payment request</button>
     </div>
   </main>
 
   <footer>
-    <p data-i18n-html="footer"></p>
+    <p data-i18n-html="footer">Open Source &middot; No Backend &middot; No KYC &middot; <a href="https://gitea.schmidt.eco/schmidt1024/xmrpay.link" target="_blank">Source</a></p>
   </footer>
 
   <div class="lang-picker" id="langPicker">

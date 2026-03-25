@@ -115,7 +115,7 @@ var I18n = (function () {
       var code = navLangs[i].substring(0, 2).toLowerCase();
       if (translations[code]) return code;
     }
-    return 'de';
+    return 'en';
   }
 
   function applyDOM(t) {

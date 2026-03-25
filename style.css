@@ -320,8 +320,8 @@ textarea {
 }
 
 .btn-primary:disabled {
-  background: #5a3520;
-  color: #bbb;
+  background: #3a2215;
+  color: #a0a0a0;
   cursor: not-allowed;
 }
 

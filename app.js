@@ -550,6 +550,7 @@
             })
           });
         }
+        showPaidStatus({ amount: xmrAmount, tx_hash: txHash });
       } else {
         proofResult.className = 'proof-result active error';
         proofResult.textContent = I18n.t('proof_no_match');
@@ -567,12 +568,43 @@
       .then(function (res) { return res.json(); })
       .then(function (data) {
         if (data.verified) {
-          paymentStatus.className = 'payment-status paid';
-          paymentStatus.innerHTML = '<div class="paid-badge">' + I18n.t('status_paid') +
-            '</div><div class="paid-detail">' + data.amount.toFixed(6) + ' XMR — TX ' +
-            data.tx_hash.substring(0, 8) + '...</div>';
+          showPaidStatus(data);
         }
       })
       .catch(function () {});
+  }
+
+  function showPaidStatus(data) {
+    paymentStatus.className = 'payment-status paid';
+    paymentStatus.innerHTML = '<div class="paid-badge">' + I18n.t('status_paid') +
+      '</div><div class="paid-detail">' + data.amount.toFixed(6) + ' XMR — TX ' +
+      data.tx_hash.substring(0, 8) + '...</div>';
+    setPaidFavicon();
+  }
+
+  function setPaidFavicon() {
+    var canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 32;
+    var ctx = canvas.getContext('2d');
+
+    // Draw Monero logo
+    var img = new Image();
+    img.onload = function () {
+      ctx.drawImage(img, 0, 0, 32, 32);
+      // Green dot (bottom-right)
+      ctx.beginPath();
+      ctx.arc(25, 25, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(25, 25, 5.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#4caf50';
+      ctx.fill();
+      // Set favicon
+      var link = document.getElementById('favicon');
+      link.href = canvas.toDataURL('image/png');
+    };
+    img.src = 'favicon.svg';
   }
 })();

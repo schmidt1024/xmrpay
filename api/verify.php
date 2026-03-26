@@ -93,18 +93,26 @@ if (!isset($urls[$code])) {
 // Store proof with atomic lock
 [$fp, $proofs] = read_json_locked($dbFile);
 
-// Don't overwrite an already-verified proof
+$status = ($input['status'] ?? 'paid') === 'pending' ? 'pending' : 'paid';
+
+// Allow overwriting a pending proof with more confirmations or a final paid status
 if (isset($proofs[$code])) {
-    flock($fp, LOCK_UN);
-    fclose($fp);
-    echo json_encode(['ok' => true]);
-    exit;
+    $existing = $proofs[$code];
+    $canOverwrite = ($existing['status'] ?? 'paid') === 'pending'
+        && ($status === 'paid' || $confirmations > ($existing['confirmations'] ?? 0));
+    if (!$canOverwrite) {
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        echo json_encode(['ok' => true]);
+        exit;
+    }
 }
 
 $proofs[$code] = [
     'tx_hash' => strtolower($txHash),
     'amount' => $amount,
     'confirmations' => $confirmations,
+    'status' => $status,
     'verified_at' => time()
 ];
 

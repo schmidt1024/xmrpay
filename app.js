@@ -8,6 +8,7 @@
   const XMR_INTEGRATED_REGEX = /^4[1-9A-HJ-NP-Za-km-z]{105}$/;
   const CACHE_DURATION = 60000; // 1 min
   const RATE_RETRY_DELAY = 10000; // 10s retry on failure
+  const XMR_CONF_REQUIRED = 10; // Monero standard output lock
 
   // --- State ---
   let fiatRates = null;
@@ -16,6 +17,8 @@
   let countdownTick = null;
   let ratesFailed = false;
   let invoiceCode = null; // short URL code for this invoice
+  let confirmPollInterval = null;
+  let pendingTxData = null; // { txHash, xmrAmount } for confirmation polling
 
   // --- DOM ---
   const $ = (s) => document.querySelector(s);
@@ -168,10 +171,12 @@
     resultSection.classList.remove('visible');
     if (countdownInterval) clearInterval(countdownInterval);
     qrContainer.innerHTML = '';
+    qrContainer.classList.remove('paid', 'confirming');
     uriBox.textContent = '';
     shareLinkInput.value = '';
     // Reset proof
     invoiceCode = null;
+    stopConfirmationPolling();
     proofPanel.classList.remove('open');
     txHashInput.value = '';
     txKeyInput.value = '';
@@ -864,23 +869,33 @@
 
       if (found) {
         var xmrAmount = Number(totalAmount) / 1e12;
-        proofResult.className = 'proof-result active success';
-        proofResult.textContent = I18n.t('proof_verified').replace('{amount}', xmrAmount.toFixed(6));
+        var confs = tx.confirmations || 0;
 
-        // Store proof with invoice
-        if (invoiceCode) {
-          await fetch('/api/verify.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              code: invoiceCode,
-              tx_hash: txHash,
-              amount: xmrAmount,
-              confirmations: tx.confirmations || 0
-            })
-          });
+        if (confs >= XMR_CONF_REQUIRED) {
+          proofResult.className = 'proof-result active success';
+          proofResult.textContent = I18n.t('proof_verified').replace('{amount}', xmrAmount.toFixed(6));
+          if (invoiceCode) {
+            await fetch('/api/verify.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code: invoiceCode, tx_hash: txHash, amount: xmrAmount, confirmations: confs, status: 'paid' })
+            });
+          }
+          showPaidStatus({ amount: xmrAmount, tx_hash: txHash, confirmations: confs });
+        } else {
+          proofResult.className = 'proof-result active warning';
+          proofResult.textContent = I18n.t('proof_confirmed_pending')
+            .replace('{amount}', xmrAmount.toFixed(6)).replace('{n}', confs);
+          if (invoiceCode) {
+            await fetch('/api/verify.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code: invoiceCode, tx_hash: txHash, amount: xmrAmount, confirmations: confs, status: 'pending' })
+            });
+          }
+          showPendingStatus({ amount: xmrAmount, tx_hash: txHash, confirmations: confs });
+          startConfirmationPolling(txHash, xmrAmount);
         }
-        showPaidStatus({ amount: xmrAmount, tx_hash: txHash });
       } else {
         proofResult.className = 'proof-result active error';
         proofResult.textContent = I18n.t('proof_no_match');
@@ -897,7 +912,25 @@
     fetch('/api/verify.php?code=' + encodeURIComponent(code))
       .then(function (res) { return res.json(); })
       .then(function (data) {
-        if (data.verified) {
+        if (!data.verified) return;
+        if (data.status === 'pending') {
+          showPendingStatus(data);
+          // Poll verify.php for updates pushed by the sender's browser
+          confirmPollInterval = setInterval(function () {
+            fetch('/api/verify.php?code=' + encodeURIComponent(code))
+              .then(function (r) { return r.json(); })
+              .then(function (d) {
+                if (!d.verified) return;
+                if (d.status === 'paid') {
+                  stopConfirmationPolling();
+                  showPaidStatus(d);
+                } else {
+                  showPendingStatus(d);
+                }
+              })
+              .catch(function () {});
+          }, 60000);
+        } else {
           showPaidStatus(data);
         }
       })
@@ -943,6 +976,78 @@
     var proofSection = document.getElementById('proofSection');
     if (proofSection) proofSection.style.display = 'none';
     setPaidFavicon();
+  }
+
+  function showPendingStatus(data) {
+    var confs = data.confirmations || 0;
+    paymentStatus.className = 'payment-status pending';
+    qrContainer.classList.add('confirming');
+
+    var existingStamp = qrContainer.querySelector('.paid-stamp');
+    if (!existingStamp) {
+      var stamp = document.createElement('div');
+      stamp.className = 'paid-stamp pending-stamp';
+      qrContainer.appendChild(stamp);
+      existingStamp = stamp;
+    }
+    existingStamp.textContent = confs === 0 ? I18n.t('status_pending') : (confs + '/10');
+
+    var hint = qrContainer.querySelector('.qr-hint');
+    if (hint && !hint.classList.contains('paid-info')) {
+      hint.textContent = data.amount.toFixed(6) + ' XMR — TX ' + data.tx_hash.substring(0, 8) + '...';
+    }
+  }
+
+  function startConfirmationPolling(txHash, xmrAmount) {
+    stopConfirmationPolling();
+    pendingTxData = { txHash: txHash, xmrAmount: xmrAmount };
+    confirmPollInterval = setInterval(pollConfirmations, 60000);
+  }
+
+  function stopConfirmationPolling() {
+    if (confirmPollInterval) {
+      clearInterval(confirmPollInterval);
+      confirmPollInterval = null;
+    }
+    pendingTxData = null;
+  }
+
+  async function pollConfirmations() {
+    if (!pendingTxData) return;
+    var txHash = pendingTxData.txHash;
+    var xmrAmount = pendingTxData.xmrAmount;
+    try {
+      var res = await fetch('/api/node.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: 'gettransactions', params: { txs_hashes: [txHash] } })
+      });
+      var data = await res.json();
+      var txs = data.txs || [];
+      if (txs.length === 0) return;
+      var confs = txs[0].confirmations || 0;
+
+      if (confs >= XMR_CONF_REQUIRED) {
+        stopConfirmationPolling();
+        proofResult.className = 'proof-result active success';
+        proofResult.textContent = I18n.t('proof_verified').replace('{amount}', xmrAmount.toFixed(6));
+        if (invoiceCode) {
+          await fetch('/api/verify.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: invoiceCode, tx_hash: txHash, amount: xmrAmount, confirmations: confs, status: 'paid' })
+          });
+        }
+        showPaidStatus({ amount: xmrAmount, tx_hash: txHash, confirmations: confs });
+      } else {
+        showPendingStatus({ amount: xmrAmount, tx_hash: txHash, confirmations: confs });
+        proofResult.className = 'proof-result active warning';
+        proofResult.textContent = I18n.t('proof_confirmed_pending')
+          .replace('{amount}', xmrAmount.toFixed(6)).replace('{n}', confs);
+      }
+    } catch (e) {
+      // silent — try again next interval
+    }
   }
 
   function setPaidFavicon() {

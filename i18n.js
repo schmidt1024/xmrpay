@@ -59,6 +59,8 @@ var I18n = (function () {
       proof_tx_not_found: 'Transaction not found',
       proof_error: 'Verification error',
       status_paid: 'Paid',
+      status_pending: 'Pending',
+      proof_confirmed_pending: 'Output found: {amount} XMR — {n}/10 confirmations. Auto-refreshing…',
       toast_integrity_warning: 'Warning: signature mismatch detected'
     },
     de: {
@@ -106,6 +108,8 @@ var I18n = (function () {
       proof_tx_not_found: 'Transaktion nicht gefunden',
       proof_error: 'Fehler bei der Verifizierung',
       status_paid: 'Bezahlt',
+      status_pending: 'Ausstehend',
+      proof_confirmed_pending: 'Output gefunden: {amount} XMR — {n}/10 Bestätigungen. Wird aktualisiert…',
       toast_integrity_warning: 'Warnung: Signatur-Nichtübereinstimmung erkannt'
     },
     fr: {
@@ -153,6 +157,8 @@ var I18n = (function () {
       proof_tx_not_found: 'Transaction introuvable',
       proof_error: 'Erreur de vérification',
       status_paid: 'Payé',
+      status_pending: 'En attente',
+      proof_confirmed_pending: 'Sortie trouvée : {amount} XMR — {n}/10 confirmations. Actualisation automatique…',
       toast_integrity_warning: 'Avertissement : détection d\'une non-concordance de signature'
     },
     it: {
@@ -200,6 +206,8 @@ var I18n = (function () {
       proof_tx_not_found: 'Transazione non trovata',
       proof_error: 'Errore di verifica',
       status_paid: 'Pagato',
+      status_pending: 'In attesa',
+      proof_confirmed_pending: 'Output trovato: {amount} XMR — {n}/10 conferme. Aggiornamento automatico…',
       toast_integrity_warning: 'Avviso: rilevata mancata corrispondenza della firma'
     },
     es: {
@@ -247,6 +255,8 @@ var I18n = (function () {
       proof_tx_not_found: 'Transacción no encontrada',
       proof_error: 'Error de verificación',
       status_paid: 'Pagado',
+      status_pending: 'Pendiente',
+      proof_confirmed_pending: 'Output encontrado: {amount} XMR — {n}/10 confirmaciones. Actualización automática…',
       toast_integrity_warning: 'Advertencia: desajuste de firma detectado'
     },
     pt: {
@@ -294,6 +304,8 @@ var I18n = (function () {
       proof_tx_not_found: 'Transação não encontrada',
       proof_error: 'Erro de verificação',
       status_paid: 'Pago',
+      status_pending: 'Pendente',
+      proof_confirmed_pending: 'Output encontrado: {amount} XMR — {n}/10 confirmações. Atualização automática…',
       toast_integrity_warning: 'Aviso: incompatibilidade de assinatura detectada'
     },
     ru: {
@@ -341,6 +353,8 @@ var I18n = (function () {
       proof_tx_not_found: 'Транзакция не найдена',
       proof_error: 'Ошибка проверки',
       status_paid: 'Оплачено',
+      status_pending: 'Ожидание',
+      proof_confirmed_pending: 'Выход найден: {amount} XMR — {n}/10 подтверждений. Авт. обновление…',
       toast_integrity_warning: 'Предупреждение: обнаружено несоответствие подписи'
     }
   };

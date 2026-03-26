@@ -556,11 +556,21 @@ textarea {
   border: 1px solid var(--error);
 }
 
+.proof-result.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid #f59e0b;
+}
+
 .payment-status {
   display: none;
 }
 
 .payment-status.paid {
+  display: block;
+}
+
+.payment-status.pending {
   display: block;
 }
 
@@ -585,6 +595,16 @@ textarea {
 .qr-container.paid canvas,
 .qr-container.paid img {
   opacity: 0.3;
+}
+
+.pending-stamp {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.qr-container.confirming canvas,
+.qr-container.confirming img {
+  opacity: 0.5;
 }
 
 .qr-container {

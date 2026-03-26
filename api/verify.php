@@ -15,6 +15,54 @@ send_security_headers();
 
 $dbFile = __DIR__ . '/../data/proofs.json';
 
+function fetch_transaction_confirmations(string $txHash): ?int {
+    $nodes = [
+        'http://node.xmr.rocks:18089',
+        'http://node.community.rino.io:18081',
+        'http://node.sethforprivacy.com:18089',
+        'http://xmr-node.cakewallet.com:18081',
+    ];
+
+    foreach ($nodes as $node) {
+        $ch = curl_init($node . '/gettransactions');
+        if ($ch === false) {
+            continue;
+        }
+
+        $body = json_encode((object)['txs_hashes' => [$txHash]]);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $body,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_CONNECTTIMEOUT => 5,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($response === false || $httpCode < 200 || $httpCode >= 300) {
+            continue;
+        }
+
+        $decoded = json_decode($response, true);
+        if (!is_array($decoded) || !isset($decoded['txs']) || !is_array($decoded['txs']) || !isset($decoded['txs'][0])) {
+            continue;
+        }
+
+        $tx = $decoded['txs'][0];
+        if (!is_array($tx)) {
+            continue;
+        }
+
+        return intval($tx['confirmations'] ?? 0);
+    }
+
+    return null;
+}
+
 // GET: Retrieve proof
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (!check_rate_limit('verify_get', 30, 60)) {
@@ -45,6 +93,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
             echo json_encode(['verified' => false]);
         } else {
+            if (is_array($proofEntry) && ($proofEntry['status'] ?? 'paid') === 'pending' && isset($proofEntry['tx_hash']) && is_string($proofEntry['tx_hash'])) {
+                $latestConfirmations = fetch_transaction_confirmations($proofEntry['tx_hash']);
+                if ($latestConfirmations !== null && $latestConfirmations > intval($proofEntry['confirmations'] ?? 0)) {
+                    $proofEntry['confirmations'] = $latestConfirmations;
+                    if ($latestConfirmations >= 10) {
+                        $proofEntry['status'] = 'paid';
+                    }
+
+                    [$fp, $allProofs] = read_json_locked($dbFile);
+                    /** @var array<string, mixed> $allProofs */
+                    $allProofs[$code] = $proofEntry;
+                    write_json_locked($fp, $allProofs);
+                }
+            }
+
             $response = ['verified' => true];
             if (is_array($proofEntry)) {
                 foreach ($proofEntry as $k => $v) {

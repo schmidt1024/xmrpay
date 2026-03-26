@@ -152,6 +152,7 @@ Requirements for full functionality:
 - [ ] Embeddable `<iframe>` payment widget
 - [ ] Invoice history (LocalStorage, CSV export)
 - [ ] "Pay Button" generator (HTML snippet)
+- [ ] Auto-cleanup: Archive or delete invoices after deadline expires
 
 ---
 

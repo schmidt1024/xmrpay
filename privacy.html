@@ -64,7 +64,7 @@
         <h3>Privacy Policy</h3>
         <p>xmrpay.link is designed to minimize data collection. No account is required.</p>
         <ul>
-          <li><strong>Rate limiting:</strong> abuse protection uses in-memory request throttling at server/edge level. No persistent IP records are stored by the application.</li>
+          <li><strong>Rate limiting:</strong> abuse protection uses short-lived, hashed-IP request records in application rate-limit files. The application does not store raw IP addresses in those records.</li>
           <li><strong>Short links:</strong> invoice hash data is stored for generated short URLs.</li>
           <li><strong>Payment proof:</strong> if used, tx hash, amount, confirmations and timestamp are stored. No Monero address is stored in the proof database.</li>
           <li><strong>No tracking:</strong> no analytics, no ads, no profiling.</li>
@@ -83,7 +83,7 @@
         <h3>Datenschutzerklaerung</h3>
         <p>xmrpay.link ist auf minimale Datenerhebung ausgelegt. Es ist kein Konto erforderlich.</p>
         <ul>
-          <li><strong>Rate-Limiting:</strong> Missbrauchsschutz erfolgt ueber In-Memory-Request-Throttling auf Server/Edge-Ebene. Die Anwendung speichert keine persistenten IP-Eintraege.</li>
+          <li><strong>Rate-Limiting:</strong> Missbrauchsschutz nutzt kurzlebige, gehashte IP-Request-Eintraege in Rate-Limit-Dateien der Anwendung. Rohe IP-Adressen werden darin nicht gespeichert.</li>
           <li><strong>Kurzlinks:</strong> Rechnungs-Hash-Daten werden fuer erzeugte Kurzlinks gespeichert.</li>
           <li><strong>Zahlungsnachweis:</strong> falls genutzt, werden TX-Hash, Betrag, Bestaetigungen und Zeitstempel gespeichert. Keine Monero-Adresse wird in der Proof-Datenbank gespeichert.</li>
           <li><strong>Kein Tracking:</strong> keine Analytics, keine Werbung, kein Profiling.</li>
@@ -102,7 +102,7 @@
         <h3>Politique de confidentialite</h3>
         <p>xmrpay.link est concu pour minimiser la collecte de donnees. Aucun compte n'est requis.</p>
         <ul>
-          <li><strong>Limitation de debit:</strong> la protection anti-abus utilise un throttling en memoire au niveau serveur/edge. L'application ne stocke pas d'enregistrements IP persistants.</li>
+          <li><strong>Limitation de debit:</strong> la protection anti-abus utilise des enregistrements de requetes IP hachees et de courte duree dans les fichiers de limitation de l'application. L'application n'y stocke pas d'adresses IP brutes.</li>
           <li><strong>Liens courts:</strong> les donnees de hachage de facture sont stockees pour les liens courts generes.</li>
           <li><strong>Preuve de paiement:</strong> si utilisee, le hash tx, le montant, les confirmations et l'horodatage sont stockes. Aucune adresse Monero n'est stockee dans la base de preuves.</li>
           <li><strong>Pas de suivi:</strong> pas d'analytics, pas de publicite, pas de profilage.</li>
@@ -121,7 +121,7 @@
         <h3>Informativa sulla privacy</h3>
         <p>xmrpay.link e progettato per ridurre al minimo la raccolta dati. Non e richiesto alcun account.</p>
         <ul>
-          <li><strong>Rate limiting:</strong> la protezione anti-abuso usa un throttling in memoria a livello server/edge. L'applicazione non salva record IP persistenti.</li>
+          <li><strong>Rate limiting:</strong> la protezione anti-abuso usa record di richieste IP hashati e di breve durata nei file di rate limit dell'applicazione. L'applicazione non salva indirizzi IP in chiaro in quei record.</li>
           <li><strong>Link brevi:</strong> i dati hash della fattura vengono salvati per i link brevi generati.</li>
           <li><strong>Prova di pagamento:</strong> se usata, vengono salvati tx hash, importo, conferme e timestamp. Nessun indirizzo Monero viene salvato nel database delle prove.</li>
           <li><strong>Nessun tracciamento:</strong> niente analytics, niente pubblicita, niente profilazione.</li>
@@ -140,7 +140,7 @@
         <h3>Politica de privacidad</h3>
         <p>xmrpay.link esta disenado para minimizar la recopilacion de datos. No se requiere cuenta.</p>
         <ul>
-          <li><strong>Limitacion de tasa:</strong> la proteccion antiabuso usa throttling en memoria a nivel servidor/edge. La aplicacion no almacena registros IP persistentes.</li>
+          <li><strong>Limitacion de tasa:</strong> la proteccion antiabuso usa registros de solicitudes con IP hasheada y de corta duracion en archivos de rate limit de la aplicacion. La aplicacion no almacena direcciones IP en claro en esos registros.</li>
           <li><strong>Enlaces cortos:</strong> se almacenan datos hash de factura para enlaces cortos generados.</li>
           <li><strong>Prueba de pago:</strong> si se usa, se almacenan tx hash, monto, confirmaciones y marca temporal. No se almacena ninguna direccion Monero en la base de pruebas.</li>
           <li><strong>Sin rastreo:</strong> sin analytics, sin anuncios, sin perfilado.</li>
@@ -159,7 +159,7 @@
         <h3>Politica de privacidade</h3>
         <p>xmrpay.link foi projetado para minimizar a coleta de dados. Nao e necessaria conta.</p>
         <ul>
-          <li><strong>Limite de taxa:</strong> a protecao contra abuso usa throttling em memoria no nivel servidor/edge. A aplicacao nao armazena registros IP persistentes.</li>
+          <li><strong>Limite de taxa:</strong> a protecao contra abuso usa registros de requisicoes com IP hasheado e de curta duracao em arquivos de rate limit da aplicacao. A aplicacao nao armazena enderecos IP em texto puro nesses registros.</li>
           <li><strong>Links curtos:</strong> dados hash da fatura sao armazenados para links curtos gerados.</li>
           <li><strong>Comprovacao de pagamento:</strong> se usada, tx hash, valor, confirmacoes e carimbo de data/hora sao armazenados. Nenhum endereco Monero e armazenado no banco de comprovacoes.</li>
           <li><strong>Sem rastreamento:</strong> sem analytics, sem anuncios, sem perfilamento.</li>
@@ -178,7 +178,7 @@
         <h3>Politika konfidentsialnosti</h3>
         <p>xmrpay.link sozdan s minimalnym sborom dannykh. Akkount ne trebuetsya.</p>
         <ul>
-          <li><strong>Ogranichenie zaprosov:</strong> zashchita ot zloupotrebleniy uses in-memory throttling na urovne server/edge. Prilozhenie ne khranit persistentnye IP-zapisi.</li>
+          <li><strong>Ogranichenie zaprosov:</strong> zashchita ot zloupotrebleniy ispolzuet kratkozhivushchie zapisi zaprosov s kheshirovannym IP v faylakh ogranicheniya prilozheniya. Prilozhenie ne khranit syrye IP-adresa v etikh zapisyakh.</li>
           <li><strong>Korotkie ssylki:</strong> khesh-dannye scheta sokhranyayutsya dlya sozdannykh korotkikh ssylok.</li>
           <li><strong>Podtverzhdenie platezha:</strong> pri ispolzovanii sokhranyayutsya tx hash, summa, podtverzhdeniya i metka vremeni. Adres Monero v baze podtverzhdeniy ne khranitsya.</li>
           <li><strong>Bez trekinga:</strong> bez analitiki, bez reklamy, bez profilirovaniya.</li>

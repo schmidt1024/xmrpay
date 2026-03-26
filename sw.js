@@ -1,11 +1,12 @@
-var CACHE_NAME = 'xmrpay-v3';
+var CACHE_NAME = 'xmrpay-v4';
 var ASSETS = [
   '/',
   '/index.html',
-  '/app.js',
-  '/i18n.js',
+  '/app.min.js?v=20260326-3',
+  '/i18n.min.js?v=20260326-3',
   '/style.css',
-  '/lib/qrcode.min.js',
+  '/lib/qrcode.min.js?v=20260326-3',
+  '/favicon.svg',
   '/fonts/inter-400.woff2',
   '/fonts/jetbrains-400.woff2'
   // xmr-crypto.bundle.js and jspdf.min.js are lazy-loaded and runtime-cached

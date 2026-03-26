@@ -464,6 +464,7 @@
     }
     paymentSummary.innerHTML = html;
     paymentSummary.classList.remove('paid-confirmed');
+    resetFavicon();
   }
 
   function updatePageTitle(xmrAmount, desc) {
@@ -993,6 +994,7 @@
     paymentStatus.className = 'payment-status pending';
     paymentSummary.classList.remove('paid-confirmed');
     qrContainer.classList.add('confirming');
+    resetFavicon();
 
     var existingStamp = qrContainer.querySelector('.paid-stamp');
     if (!existingStamp) {
@@ -1063,13 +1065,29 @@
     }
   }
 
+  function getBaseFaviconHref() {
+    var link = document.getElementById('favicon');
+    if (!link) return 'favicon.svg';
+    var baseHref = link.getAttribute('data-base-href') || link.getAttribute('href') || 'favicon.svg';
+    if (!link.getAttribute('data-base-href')) {
+      link.setAttribute('data-base-href', baseHref);
+    }
+    return baseHref;
+  }
+
+  function resetFavicon() {
+    var link = document.getElementById('favicon');
+    if (!link) return;
+    link.href = getBaseFaviconHref();
+  }
+
   function setPaidFavicon() {
     var canvas = document.createElement('canvas');
     canvas.width = 32;
     canvas.height = 32;
     var ctx = canvas.getContext('2d');
 
-    // Draw Monero logo
+    // Draw current base favicon and overlay paid badge
     var img = new Image();
     img.onload = function () {
       ctx.drawImage(img, 0, 0, 32, 32);
@@ -1086,6 +1104,6 @@
       var link = document.getElementById('favicon');
       link.href = canvas.toDataURL('image/png');
     };
-    img.src = 'favicon.svg';
+    img.src = getBaseFaviconHref();
   }
 })();

@@ -400,7 +400,7 @@
     return true;
   }
 
-  // Verify that short URL has not been tampered with by checking HMAC signature
+  // Verify that the redirected hash still matches the stored short URL mapping.
   function verifyShortUrlIntegrity(code, currentHash) {
     fetch('/api/check-short.php?code=' + encodeURIComponent(code))
       .then(function (res) { 
@@ -408,45 +408,18 @@
         return res.json(); 
       })
       .then(function (data) {
-        if (!data.signature) {
-          // Old format without signature - no integrity check
+        if (!data.hash) {
           return;
         }
-        
-        // Verify HMAC signature client-side
-        verifyHmacSignature(data.hash, data.signature).then(function (valid) {
-          if (!valid) {
-            console.warn('xmrpay: Hash signature mismatch - possible server tampering detected');
-            showToast(I18n.t('toast_integrity_warning'));
-          }
-        });
+
+        if (data.hash !== currentHash) {
+          console.warn('xmrpay: Short URL hash mismatch detected for code', code);
+          showToast(I18n.t('toast_integrity_warning'));
+        }
       })
       .catch(function (e) { 
         console.warn('xmrpay: Could not verify short URL integrity:', e);
       });
-  }
-
-  // Client-side HMAC-SHA256 verification
-  async function verifyHmacSignature(hash, expectedSignature) {
-    try {
-      // Use hostname as part of the secret (same as server-side)
-      const secret = await crypto.subtle.digest('SHA-256', 
-        new TextEncoder().encode(location.hostname + 'xmrpay.link'));
-      const key = await crypto.subtle.importKey('raw', secret, 
-        { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-      const signature = await crypto.subtle.sign('HMAC', key, 
-        new TextEncoder().encode(hash));
-      
-      // Convert to hex string
-      const sigHex = Array.from(new Uint8Array(signature))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
-      
-      return sigHex === expectedSignature;
-    } catch (e) {
-      console.warn('xmrpay: HMAC verification failed:', e);
-      return false;
-    }
   }
 
   function buildSummary(xmrAmount, desc, days) {

@@ -320,12 +320,16 @@
     buildSummary(xmrAmount, desc, timer);
     updatePageTitle(xmrAmount, desc);
 
-    // Share link — show long URL immediately, then replace with short
+    // Share link — keep existing short URL if present; otherwise shorten new hash
     const hash = buildHash(addr, xmrAmount, desc, timer);
-    shareLinkInput.value = location.origin + '/#' + hash;
-    shortenUrl(hash).then(function (shortUrl) {
-      if (shortUrl) shareLinkInput.value = shortUrl;
-    });
+    if (invoiceCode) {
+      shareLinkInput.value = location.origin + '/s/' + invoiceCode;
+    } else {
+      shareLinkInput.value = location.origin + '/#' + hash;
+      shortenUrl(hash).then(function (shortUrl) {
+        if (shortUrl) shareLinkInput.value = shortUrl;
+      });
+    }
 
     // QR
     qrContainer.innerHTML = '';

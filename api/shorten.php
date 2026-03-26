@@ -24,6 +24,7 @@ $dbFile = __DIR__ . '/../data/urls.json';
 $rawInput = file_get_contents('php://input');
 $input = is_string($rawInput) ? json_decode($rawInput, true) : null;
 $hash = is_array($input) && isset($input['hash']) && is_string($input['hash']) ? $input['hash'] : '';
+$expiryTs = is_array($input) && isset($input['expiry_ts']) ? intval($input['expiry_ts']) : 0;
 
 if (empty($hash) || strlen($hash) > 500 || !preg_match('/^[a-zA-Z0-9%+_=&.-]{1,500}$/', $hash)) {
     http_response_code(400);
@@ -69,6 +70,9 @@ while (isset($urls[$code])) {
 
 $signature = hash_hmac('sha256', $hash, $secret);
 $urls[$code] = ['h' => $hash, 's' => $signature];
+if ($expiryTs > 0) {
+    $urls[$code]['e'] = $expiryTs;
+}
 
 write_json_locked($fp, $urls);
 

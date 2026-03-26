@@ -31,6 +31,21 @@ $data = $urls[$code];
 $hash = is_array($data) ? ($data['h'] ?? '') : $data;
 $hash = is_string($hash) ? $hash : '';
 $signature = is_array($data) ? ($data['s'] ?? null) : null;
+$expiryTs = is_array($data) ? intval($data['e'] ?? 0) : 0;
+
+// Check if URL has expired (lazy cleanup)
+if ($expiryTs > 0 && time() > $expiryTs) {
+    require_once __DIR__ . '/api/_helpers.php';
+    //  Delete expired URL
+    [$fp, $urls] = read_json_locked(__DIR__ . '/data/urls.json');
+    if (isset($urls[$code])) {
+        unset($urls[$code]);
+        write_json_locked($fp, $urls);
+    }
+    http_response_code(410);
+    echo 'Gone';
+    exit;
+}
 
 // Verify HMAC signature if present (detect server-side tampering)
 if (is_string($signature) && $signature !== '') {

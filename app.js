@@ -282,10 +282,15 @@
 
   async function shortenUrl(hash) {
     try {
+      // Calculate expiry timestamp if deadline is set
+      let expiryTs = null;
+      if (selectedDays && selectedDays > 0) {
+        expiryTs = Math.floor((Date.now() + selectedDays * 86400000) / 1000);
+      }
       const res = await fetch('/api/shorten.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hash: hash })
+        body: JSON.stringify({ hash: hash, expiry_ts: expiryTs })
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();

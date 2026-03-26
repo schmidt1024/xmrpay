@@ -31,16 +31,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $decodedProofs = is_string($rawProofs) ? json_decode($rawProofs, true) : [];
     $proofs = is_array($decodedProofs) ? $decodedProofs : [];
     if (isset($proofs[$code])) {
-        $response = ['verified' => true];
         $proofEntry = $proofs[$code];
-        if (is_array($proofEntry)) {
-            foreach ($proofEntry as $k => $v) {
-                if (is_string($k)) {
-                    $response[$k] = $v;
+        $proofExpiry = is_array($proofEntry) ? intval($proofEntry['e'] ?? 0) : 0;
+        
+        // Check if proof has expired (lazy cleanup)
+        if ($proofExpiry > 0 && time() > $proofExpiry) {
+            unset($proofs[$code]);
+            [$fp, $allProofs] = read_json_locked($dbFile);
+            if (isset($allProofs[$code])) {
+                unset($allProofs[$code]);
+                write_json_locked($fp, $allProofs);
+            }
+            echo json_encode(['verified' => false]);
+        } else {
+            $response = ['verified' => true];
+            if (is_array($proofEntry)) {
+                foreach ($proofEntry as $k => $v) {
+                    if (is_string($k)) {
+                        $response[$k] = $v;
+                    }
                 }
             }
+            echo json_encode($response);
         }
-        echo json_encode($response);
     } else {
         echo json_encode(['verified' => false]);
     }
@@ -131,6 +144,11 @@ $proofs[$code] = [
     'status' => $status,
     'verified_at' => time()
 ];
+
+// Copy expiry timestamp from URL if it exists
+if (isset($urls[$code]) && is_array($urls[$code]) && isset($urls[$code]['e']) && $urls[$code]['e'] > 0) {
+    $proofs[$code]['e'] = $urls[$code]['e'];
+}
 
 write_json_locked($fp, $proofs);
 echo json_encode(['ok' => true]);

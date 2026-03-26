@@ -29,11 +29,10 @@ $signature = is_array($data) ? $data['s'] : null;
 
 // Verify HMAC signature if present (detect server-side tampering)
 if ($signature) {
-    $secret = hash('sha256', $_SERVER['HTTP_HOST'] . 'xmrpay.link');
-    $expected_sig = hash_hmac('sha256', $hash, $secret);
-    if ($signature !== $expected_sig) {
-        // Signature mismatch - possible tampering detected
-        // Log and proceed anyway (graceful degradation)
+    require_once __DIR__ . '/api/_helpers.php';
+    $expected_sig = hash_hmac('sha256', $hash, get_hmac_secret());
+    if (!hash_equals($expected_sig, $signature)) {
+        // Signature mismatch — possible tampering, log and proceed (graceful degradation)
         error_log("xmrpay: Signature mismatch for code $code");
     }
 }

@@ -1,15 +1,17 @@
 <?php
+<?php
+require_once __DIR__ . '/_helpers.php';
+
 /**
  * Short URL Integrity Verification API
- * GET: Return the hash and HMAC signature for client-side verification
- * 
- * Security: Allows client-side verification that the hash has not been
- * tampered with by the server. The signature is verified using the 
- * hostname as part of the secret HMAC key.
+ * GET: Return the hash and HMAC signature for client-side verification.
+ *
+ * Security: Allows client-side detection of server-side tampering.
+ * The HMAC secret is stored in data/secret.key (auto-generated on first run).
  */
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+send_security_headers();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
@@ -42,9 +44,11 @@ $data = $urls[$code];
 $hash = is_array($data) ? $data['h'] : $data;
 $signature = is_array($data) ? $data['s'] : null;
 
-// Return hash and signature for client-side verification
+// Re-derive expected signature so client can verify
+$expected = $signature ? hash_hmac('sha256', $hash, get_hmac_secret()) : null;
+
 echo json_encode([
     'code' => $code,
     'hash' => $hash,
-    'signature' => $signature
+    'signature' => $expected
 ]);

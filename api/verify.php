@@ -1,30 +1,34 @@
 <?php
+<?php
+require_once __DIR__ . '/_helpers.php';
+
 /**
  * TX Proof Storage API
  * POST: Store verified payment proof for an invoice
  * GET:  Retrieve payment status for an invoice
- * 
- * Privacy note: Only stores TX hash, amount, and confirmations.
- * Payee address is NOT stored — verification happens client-side only.
- * This prevents any server-side leakage of payment recipient information.
+ *
+ * Privacy: Only TX hash, amount, and confirmations are stored.
+ * Payee address is NEVER stored — verification happens client-side only.
  */
 
 header('Content-Type: application/json');
+send_security_headers();
 
 $dbFile = __DIR__ . '/../data/proofs.json';
-$proofs = [];
-if (file_exists($dbFile)) {
-    $proofs = json_decode(file_get_contents($dbFile), true) ?: [];
-}
 
 // GET: Retrieve proof
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (!check_rate_limit('verify_get', 30, 60)) {
+        http_response_code(429);
+        echo json_encode(['error' => 'Rate limit exceeded']);
+        exit;
+    }
     $code = $_GET['code'] ?? '';
     if (empty($code) || !preg_match('/^[a-z0-9]{4,10}$/', $code)) {
         echo json_encode(['verified' => false]);
         exit;
     }
-
+    $proofs = file_exists($dbFile) ? (json_decode(file_get_contents($dbFile), true) ?: []) : [];
     if (isset($proofs[$code])) {
         echo json_encode(array_merge(['verified' => true], $proofs[$code]));
     } else {
@@ -37,6 +41,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'Method not allowed']);
+    exit;
+}
+
+verify_origin();
+
+if (!check_rate_limit('verify_post', 10, 3600)) {
+    http_response_code(429);
+    echo json_encode(['error' => 'Rate limit exceeded']);
     exit;
 }
 
@@ -64,7 +76,7 @@ if (!preg_match('/^[0-9a-fA-F]{64}$/', $txHash)) {
     exit;
 }
 
-// Verify the short URL code exists
+// Verify the short URL code exists (read-only, no lock needed here)
 $urlsFile = __DIR__ . '/../data/urls.json';
 if (!file_exists($urlsFile)) {
     http_response_code(404);
@@ -78,7 +90,17 @@ if (!isset($urls[$code])) {
     exit;
 }
 
-// Store proof
+// Store proof with atomic lock
+[$fp, $proofs] = read_json_locked($dbFile);
+
+// Don't overwrite an already-verified proof
+if (isset($proofs[$code])) {
+    flock($fp, LOCK_UN);
+    fclose($fp);
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
 $proofs[$code] = [
     'tx_hash' => strtolower($txHash),
     'amount' => $amount,
@@ -86,5 +108,6 @@ $proofs[$code] = [
     'verified_at' => time()
 ];
 
-file_put_contents($dbFile, json_encode($proofs, JSON_PRETTY_PRINT));
+write_json_locked($fp, $proofs);
 echo json_encode(['ok' => true]);
+

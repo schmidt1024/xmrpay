@@ -41,6 +41,17 @@ self.addEventListener('fetch', function (e) {
     return;
   }
 
+  // Navigation (HTML) — network first, fall back to cached index.html for offline
+  // Invoice data is in the URL hash, so caching the document would cause stale state
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(function () {
+        return caches.match('/index.html');
+      })
+    );
+    return;
+  }
+
   // App assets — cache first, fallback to network
   e.respondWith(
     caches.match(e.request).then(function (cached) {

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/_helpers.php';
+
 /**
  * Monero Daemon RPC Proxy
  * Forwards allowed RPC requests to Monero nodes, bypassing CORS.
@@ -6,6 +8,8 @@
  */
 
 header('Content-Type: application/json');
+send_security_headers();
+verify_origin();
 
 // Only POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -41,7 +45,7 @@ if (file_exists($rateFile)) {
     $rateData = array_filter($rateData, fn($t) => $t > $now - 60);
 }
 
-if (count($rateData) >= 1000) {
+if (count($rateData) >= 60) {
     http_response_code(429);
     echo json_encode(['error' => 'Rate limit exceeded']);
     exit;

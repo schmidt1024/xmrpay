@@ -1,8 +1,8 @@
 <?php
+require_once __DIR__ . '/_helpers.php';
+
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
+send_security_headers();
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit; }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -11,42 +11,42 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$dataDir = __DIR__ . '/../data';
-$dbFile = $dataDir . '/urls.json';
+verify_origin();
 
-if (!is_dir($dataDir)) {
-    mkdir($dataDir, 0750, true);
+if (!check_rate_limit('shorten', 20, 3600)) {
+    http_response_code(429);
+    echo json_encode(['error' => 'Rate limit exceeded']);
+    exit;
 }
 
-// Secret for HMAC (derived from hostname to protect against server-side tampering)
-$secret = hash('sha256', $_SERVER['HTTP_HOST'] . 'xmrpay.link');
+$dbFile = __DIR__ . '/../data/urls.json';
 
 $input = json_decode(file_get_contents('php://input'), true);
 $hash = $input['hash'] ?? '';
 
-if (empty($hash) || strlen($hash) > 500) {
+if (empty($hash) || strlen($hash) > 500 || !preg_match('/^[a-zA-Z0-9%+_=&.-]{1,500}$/', $hash)) {
     http_response_code(400);
     echo json_encode(['error' => 'Invalid data']);
     exit;
 }
 
-// Load existing URLs
-$urls = [];
-if (file_exists($dbFile)) {
-    $urls = json_decode(file_get_contents($dbFile), true) ?: [];
-}
+$secret = get_hmac_secret();
+
+[$fp, $urls] = read_json_locked($dbFile);
 
 // Check if this hash already exists
 foreach ($urls as $code => $data) {
     $stored_hash = is_array($data) ? $data['h'] : $data;
     if ($stored_hash === $hash) {
+        flock($fp, LOCK_UN);
+        fclose($fp);
         echo json_encode(['code' => $code]);
         exit;
     }
 }
 
 // Generate short code (6 chars)
-function generateCode($length = 6) {
+function generateCode(int $length = 6): string {
     $chars = 'abcdefghijkmnpqrstuvwxyz23456789';
     $code = '';
     for ($i = 0; $i < $length; $i++) {
@@ -55,19 +55,14 @@ function generateCode($length = 6) {
     return $code;
 }
 
-// Generate HMAC signature to detect server-side tampering
-$signature = hash_hmac('sha256', $hash, $secret);
-
 $code = generateCode();
 while (isset($urls[$code])) {
     $code = generateCode();
 }
 
-// Store hash with signature
-$urls[$code] = [
-    'h' => $hash,
-    's' => $signature  // HMAC signature for integrity verification
-];
-file_put_contents($dbFile, json_encode($urls, JSON_UNESCAPED_UNICODE), LOCK_EX);
+$signature = hash_hmac('sha256', $hash, $secret);
+$urls[$code] = ['h' => $hash, 's' => $signature];
+
+write_json_locked($fp, $urls);
 
 echo json_encode(['code' => $code]);

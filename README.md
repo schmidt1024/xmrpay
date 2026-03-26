@@ -1,6 +1,6 @@
 # xmrpay.link — Monero Invoice Generator
 
-> Private. Self-hosted. No accounts. No backend for accounts. No bullshit.
+> Private. Self-hosted. No accounts. No tracking. No bullshit.
 
 **[Live: xmrpay.link](https://xmrpay.link)** · **[Tor: mc6wfe...zyd.onion](http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion)**
 
@@ -12,12 +12,28 @@
 
 Enter your address, the amount, an optional description — and get a QR code, a shareable short link, and a PDF invoice. Done.
 
-### Privacy & Transparency
+### Architecture & Transparency
 
-- **Client-side first:** All cryptographic operations (QR codes, payment verification, PDF generation) run in your browser. Your private keys never leave your device.
-- **Minimal backend:** Optional short URLs, fiat rate caching, and proof storage use a small server component with **no account tracking**. You can self-host or use the public instance.
-- **HMAC-signed short URLs:** Invoice hashes are cryptographically signed to detect server-side tampering.
-- **Address privacy:** Payment proofs are verified client-side only; the server never stores your XMR address.
+xmrpay.link uses a **minimal backend** for the following specific purposes:
+
+| Component | Where it runs | What the server sees |
+|-----------|--------------|---------------------|
+| QR code generation | Browser only | Nothing |
+| PDF invoice | Browser only | Nothing |
+| Payment (TX) verification | Browser only | Nothing |
+| Fiat exchange rates | Server (CoinGecko proxy) | Your IP address |
+| Short URL storage | Server | Invoice hash (address + amount + description), HMAC-signed |
+| Payment proof storage | Server | TX hash + amount — **not** your XMR address |
+
+**Self-hosting** eliminates any trust in the public instance.  
+**No short links** (use the long `/#...` URL or QR code) = zero server involvement.
+
+### Security Model
+
+- **HMAC-signed short URLs:** Hashes are signed with a server-side secret. Clients verify the signature on load to detect tampering.
+- **Address never stored:** Payment verification is cryptographic and runs client-side. The server never learns your XMR address.
+- **Rate-limited APIs:** All write endpoints are rate-limited per IP.
+- **Origin-restricted:** API endpoints reject cross-origin requests.
 
 ---
 

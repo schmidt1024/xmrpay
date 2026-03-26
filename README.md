@@ -10,7 +10,7 @@
 
 **xmrpay.link** is a client-side web app that lets anyone create a professional Monero payment request in under 30 seconds — no account registration, no KYC, no custodial services.
 
-Enter your address, the amount, an optional description — and get a QR code, a shareable short link, and a PDF invoice. Done.
+Enter your address, the amount, an optional description — and get a wallet-native `monero:` URI, QR code, and PDF invoice. Short links are optional.
 
 ### Architecture & Transparency
 
@@ -25,8 +25,15 @@ xmrpay.link uses a **minimal backend** for the following specific purposes:
 | Short URL storage | Server | Invoice hash (address + amount + description), HMAC-signed |
 | Payment proof storage | Server | TX hash + amount — **not** your XMR address |
 
-**Self-hosting** eliminates any trust in the public instance.  
-**No short links** (use the long `/#...` URL or QR code) = zero server involvement.
+**Self-hosting** eliminates trust in the public instance.  
+**No short links** (use wallet URI / long `/#...` URL / QR code) = no shortlink lookup dependency.
+
+### Trust Model (Important)
+
+- **Default mode:** wallet-native URI + QR (no shortlink lookup).
+- **Short links are opt-in:** convenience feature with a trust trade-off.
+- **Public instance caution:** if a server is fully compromised, first-access shortlink resolution can be manipulated.
+- **Best security posture:** use wallet URI directly or self-host.
 
 ### Security Model
 
@@ -34,6 +41,7 @@ xmrpay.link uses a **minimal backend** for the following specific purposes:
 - **Address never stored:** Payment verification is cryptographic and runs client-side. The server never learns your XMR address.
 - **Rate-limited APIs:** All write endpoints are rate-limited per IP.
 - **Origin-restricted:** API endpoints reject cross-origin requests.
+- **Clear scope:** HMAC improves integrity checks, but it is not a complete defense against a fully compromised server.
 
 ---
 
@@ -57,8 +65,9 @@ xmrpay.link uses a **minimal backend** for the following specific purposes:
 - XMR address input with validation (standard, subaddress, integrated)
 - Amount in XMR or fiat (EUR/USD/CHF/GBP/JPY/RUB/BRL via CoinGecko, auto-detected)
 - Description and payment deadline (7/14/30 days or custom)
-- QR code with `monero:` URI
-- Shareable short URLs (`/s/abc123`) with HMAC signatures for integrity
+- Wallet-native `monero:` URI with copy action
+- QR code for the same wallet-native URI
+- Optional short URL toggle (`/s/abc123`) with explicit trust trade-off hint
 - PDF invoice download (with QR, amount, fiat equivalent, deadline)
 - i18n (EN, DE, FR, IT, ES, PT, RU) with automatic browser detection
 

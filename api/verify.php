@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if ($proofExpiry > 0 && time() > $proofExpiry) {
             unset($proofs[$code]);
             [$fp, $allProofs] = read_json_locked($dbFile);
+            /** @var array<string, mixed> $allProofs */
             if (isset($allProofs[$code])) {
                 unset($allProofs[$code]);
                 write_json_locked($fp, $allProofs);

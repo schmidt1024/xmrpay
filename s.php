@@ -38,6 +38,7 @@ if ($expiryTs > 0 && time() > $expiryTs) {
     require_once __DIR__ . '/api/_helpers.php';
     //  Delete expired URL
     [$fp, $urls] = read_json_locked(__DIR__ . '/data/urls.json');
+    /** @var array<string, mixed> $urls */
     if (isset($urls[$code])) {
         unset($urls[$code]);
         write_json_locked($fp, $urls);

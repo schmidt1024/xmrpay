@@ -148,6 +148,16 @@ Requirements for full functionality:
 - Nginx or Apache (for `/s/` short URL rewrites)
 - Writable `data/` directory
 
+### Production Deploy (Safe)
+
+Use the provided deploy script to avoid deleting runtime files in `data/`:
+
+```bash
+./scripts/deploy.sh
+```
+
+This script deploys with `rsync --delete` but explicitly excludes `data/`.
+
 ---
 
 ## Security

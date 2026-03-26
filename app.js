@@ -994,7 +994,7 @@
     paymentStatus.className = 'payment-status pending';
     paymentSummary.classList.remove('paid-confirmed');
     qrContainer.classList.add('confirming');
-    resetFavicon();
+    setPendingFavicon();
 
     var existingStamp = qrContainer.querySelector('.paid-stamp');
     if (!existingStamp) {
@@ -1081,29 +1081,35 @@
     link.href = getBaseFaviconHref();
   }
 
-  function setPaidFavicon() {
+  function setStatusFaviconBadge(color) {
     var canvas = document.createElement('canvas');
     canvas.width = 32;
     canvas.height = 32;
     var ctx = canvas.getContext('2d');
 
-    // Draw current base favicon and overlay paid badge
+    // Draw current base favicon and overlay status badge
     var img = new Image();
     img.onload = function () {
       ctx.drawImage(img, 0, 0, 32, 32);
-      // Green dot (bottom-right)
       ctx.beginPath();
       ctx.arc(25, 25, 7, 0, Math.PI * 2);
       ctx.fillStyle = '#fff';
       ctx.fill();
       ctx.beginPath();
       ctx.arc(25, 25, 5.5, 0, Math.PI * 2);
-      ctx.fillStyle = '#4caf50';
+      ctx.fillStyle = color;
       ctx.fill();
-      // Set favicon
       var link = document.getElementById('favicon');
       link.href = canvas.toDataURL('image/png');
     };
     img.src = getBaseFaviconHref();
+  }
+
+  function setPaidFavicon() {
+    setStatusFaviconBadge('#4caf50');
+  }
+
+  function setPendingFavicon() {
+    setStatusFaviconBadge('#f59e0b');
   }
 })();

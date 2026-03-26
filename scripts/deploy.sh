@@ -68,14 +68,14 @@ else
   echo "Skipping pre-deploy backup (DEPLOY_BACKUP_ENABLE=0)."
 fi
 
-RSYNC_DRY_RUN=()
+RSYNC_DRY_RUN=""
 if [[ "$DRY_RUN" == "1" ]]; then
-  RSYNC_DRY_RUN+=("--dry-run")
+  RSYNC_DRY_RUN="--dry-run"
   echo "Running in dry-run mode (DEPLOY_DRY_RUN=1)."
 fi
 
 rsync -avz --delete \
-  "${RSYNC_DRY_RUN[@]}" \
+  ${RSYNC_DRY_RUN} \
   --exclude '.git' \
   --exclude 'node_modules' \
   --exclude 'data/' \

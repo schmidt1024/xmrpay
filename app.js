@@ -29,6 +29,7 @@
   const timerCustom = $('#timerCustom');
   const deadlineBadges = $('#deadlineBadges');
   let selectedDays = 0;
+  let deadlineEndMs = null;
   const generateBtn = $('#generate');
   const resultSection = $('#result');
   const qrContainer = $('#qr');
@@ -131,11 +132,13 @@
       if (btn.classList.contains('active')) {
         btn.classList.remove('active');
         selectedDays = 0;
+        deadlineEndMs = null;
         timerCustom.value = '';
       } else {
         deadlineBadges.querySelectorAll('.badge').forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
         selectedDays = days;
+        deadlineEndMs = null;
         timerCustom.value = '';
       }
     });
@@ -143,6 +146,7 @@
   timerCustom.addEventListener('input', function () {
     deadlineBadges.querySelectorAll('.badge').forEach(function (b) { b.classList.remove('active'); });
     selectedDays = parseInt(timerCustom.value) || 0;
+    deadlineEndMs = null;
   });
 
   // PDF
@@ -162,6 +166,7 @@
     currencySelect.value = 'EUR';
     descInput.value = '';
     selectedDays = 0;
+    deadlineEndMs = null;
     timerCustom.value = '';
     deadlineBadges.querySelectorAll('.badge').forEach(function (b) { b.classList.remove('active'); });
     fiatHint.textContent = '';
@@ -271,12 +276,13 @@
     return uri;
   }
 
-  function buildHash(addr, xmrAmount, desc, timer) {
+  function buildHash(addr, xmrAmount, desc, timer, deadlineTs) {
     const params = new URLSearchParams();
     params.set('a', addr);
     if (xmrAmount) params.set('x', xmrAmount.toFixed(12));
     if (desc) params.set('d', desc);
     if (timer) params.set('t', timer);
+    if (deadlineTs) params.set('te', deadlineTs);
     return params.toString();
   }
 
@@ -321,7 +327,14 @@
     updatePageTitle(xmrAmount, desc);
 
     // Share link — keep existing short URL if present; otherwise shorten new hash
-    const hash = buildHash(addr, xmrAmount, desc, timer);
+    var deadlineTs = null;
+    if (timer && timer > 0) {
+      if (!deadlineEndMs) {
+        deadlineEndMs = Date.now() + timer * 86400000;
+      }
+      deadlineTs = Math.floor(deadlineEndMs / 1000);
+    }
+    const hash = buildHash(addr, xmrAmount, desc, timer, deadlineTs);
     if (invoiceCode) {
       shareLinkInput.value = location.origin + '/s/' + invoiceCode;
     } else {
@@ -388,6 +401,11 @@
       }
     }
 
+    const deadlineTs = parseInt(params.get('te') || '0');
+    if (deadlineTs > 0) {
+      deadlineEndMs = deadlineTs * 1000;
+    }
+
     // Check for short URL code and load payment status
     const code = params.get('c');
     if (code) {
@@ -414,6 +432,13 @@
       .then(function (data) {
         if (!data.hash) {
           return;
+        }
+
+        if (data.expiry_ts && parseInt(data.expiry_ts) > 0) {
+          deadlineEndMs = parseInt(data.expiry_ts) * 1000;
+          if (resultSection.classList.contains('visible')) {
+            startCountdown();
+          }
         }
 
         var params = new URLSearchParams(currentHash);
@@ -462,9 +487,10 @@
     countdownEl.textContent = '';
     countdownEl.className = 'countdown';
 
-    if (!selectedDays || selectedDays <= 0) return;
+    if ((!selectedDays || selectedDays <= 0) && !deadlineEndMs) return;
 
-    const end = Date.now() + selectedDays * 86400000;
+    const end = deadlineEndMs || (Date.now() + selectedDays * 86400000);
+    deadlineEndMs = end;
     countdownEl.classList.add('active');
 
     function tick() {

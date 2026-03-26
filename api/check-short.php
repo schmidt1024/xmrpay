@@ -45,6 +45,7 @@ $data = $urls[$code];
 $hash = is_array($data) ? ($data['h'] ?? '') : $data;
 $hash = is_string($hash) ? $hash : '';
 $signature = is_array($data) ? $data['s'] : null;
+$expiryTs = is_array($data) ? intval($data['e'] ?? 0) : 0;
 
 // Re-derive expected signature so client can verify
 $expected = $signature ? hash_hmac('sha256', $hash, get_hmac_secret()) : null;
@@ -52,5 +53,6 @@ $expected = $signature ? hash_hmac('sha256', $hash, get_hmac_secret()) : null;
 echo json_encode([
     'code' => $code,
     'hash' => $hash,
-    'signature' => $expected
+    'signature' => $expected,
+    'expiry_ts' => $expiryTs > 0 ? $expiryTs : null
 ]);

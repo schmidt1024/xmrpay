@@ -120,6 +120,19 @@ xmrpay.link/
 
 ---
 
+## Invoice Lifecycle
+
+**Optional Deadline:** When creating an invoice, you can set an expiration deadline (7/14/30 days or custom). 
+
+**Lazy Cleanup:** When a deadline is enabled, the short URL and payment proof are automatically deleted if accessed after expiration:
+- Accessing an expired short URL returns **HTTP 410 Gone** and removes the entry
+- Retrieving a proof for an expired invoice returns `verified: false` and cleans up the entry
+- No background jobs or cron tasks required
+
+**No deadline?** Invoices without a deadline persist indefinitely (no auto-cleanup).
+
+---
+
 ## Self-Hosting
 
 ```bash
@@ -152,7 +165,7 @@ Requirements for full functionality:
 - [ ] Embeddable `<iframe>` payment widget
 - [ ] Invoice history (LocalStorage, CSV export)
 - [ ] "Pay Button" generator (HTML snippet)
-- [ ] Auto-cleanup: Archive or delete invoices after deadline expires
+- [x] Auto-cleanup: Lazy-delete invoices after deadline expires
 
 ---
 

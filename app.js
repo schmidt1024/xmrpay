@@ -412,7 +412,11 @@
           return;
         }
 
-        if (data.hash !== currentHash) {
+        var params = new URLSearchParams(currentHash);
+        params.delete('c');
+        var normalizedHash = params.toString();
+
+        if (data.hash !== normalizedHash) {
           console.warn('xmrpay: Short URL hash mismatch detected for code', code);
           showToast(I18n.t('toast_integrity_warning'));
         }

@@ -6,8 +6,10 @@ $cacheFile = __DIR__ . '/../data/rates_cache.json';
 $cacheTTL = 120; // seconds
 
 if (file_exists($cacheFile)) {
-    $cached = json_decode(file_get_contents($cacheFile), true);
-    if ($cached && (time() - ($cached['_time'] ?? 0)) < $cacheTTL) {
+    $rawCached = file_get_contents($cacheFile);
+    $cached = is_string($rawCached) ? json_decode($rawCached, true) : null;
+    $cachedTime = is_array($cached) && isset($cached['_time']) && is_numeric($cached['_time']) ? (int)$cached['_time'] : 0;
+    if (is_array($cached) && (time() - $cachedTime) < $cacheTTL) {
         unset($cached['_time']);
         header('Cache-Control: public, max-age=60');
         echo json_encode($cached);
@@ -15,10 +17,15 @@ if (file_exists($cacheFile)) {
     }
 }
 
-$currencies = $_GET['c'] ?? 'eur,usd,chf,gbp,jpy,rub,brl';
+$currencies = isset($_GET['c']) && is_string($_GET['c']) ? $_GET['c'] : 'eur,usd,chf,gbp,jpy,rub,brl';
 $currencies = preg_replace('/[^a-z,]/', '', strtolower($currencies));
 $url = 'https://api.coingecko.com/api/v3/simple/price?ids=monero&vs_currencies=' . $currencies;
 $ch = curl_init($url);
+if ($ch === false) {
+    http_response_code(502);
+    echo json_encode(['error' => 'Failed to initialize request']);
+    exit;
+}
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT => 10,
@@ -30,7 +37,7 @@ curl_close($ch);
 
 if ($response !== false && $httpCode === 200) {
     $data = json_decode($response, true);
-    if ($data) {
+    if (is_array($data)) {
         $data['_time'] = time();
         file_put_contents($cacheFile, json_encode($data));
         unset($data['_time']);
@@ -42,8 +49,9 @@ if ($response !== false && $httpCode === 200) {
 
 // On error, serve stale cache if available
 if (file_exists($cacheFile)) {
-    $cached = json_decode(file_get_contents($cacheFile), true);
-    if ($cached) {
+    $rawCached = file_get_contents($cacheFile);
+    $cached = is_string($rawCached) ? json_decode($rawCached, true) : null;
+    if (is_array($cached)) {
         unset($cached['_time']);
         header('Cache-Control: public, max-age=30');
         echo json_encode($cached);

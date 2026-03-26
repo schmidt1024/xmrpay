@@ -21,8 +21,9 @@ if (!check_rate_limit('shorten', 20, 3600)) {
 
 $dbFile = __DIR__ . '/../data/urls.json';
 
-$input = json_decode(file_get_contents('php://input'), true);
-$hash = $input['hash'] ?? '';
+$rawInput = file_get_contents('php://input');
+$input = is_string($rawInput) ? json_decode($rawInput, true) : null;
+$hash = is_array($input) && isset($input['hash']) && is_string($input['hash']) ? $input['hash'] : '';
 
 if (empty($hash) || strlen($hash) > 500 || !preg_match('/^[a-zA-Z0-9%+_=&.-]{1,500}$/', $hash)) {
     http_response_code(400);
@@ -33,10 +34,16 @@ if (empty($hash) || strlen($hash) > 500 || !preg_match('/^[a-zA-Z0-9%+_=&.-]{1,5
 $secret = get_hmac_secret();
 
 [$fp, $urls] = read_json_locked($dbFile);
+if (!is_array($urls)) {
+    $urls = [];
+}
 
 // Check if this hash already exists
 foreach ($urls as $code => $data) {
-    $stored_hash = is_array($data) ? $data['h'] : $data;
+    $stored_hash = is_array($data) ? ($data['h'] ?? null) : $data;
+    if (!is_string($stored_hash)) {
+        continue;
+    }
     if ($stored_hash === $hash) {
         flock($fp, LOCK_UN);
         fclose($fp);

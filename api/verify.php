@@ -22,14 +22,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode(['error' => 'Rate limit exceeded']);
         exit;
     }
-    $code = $_GET['code'] ?? '';
+    $code = isset($_GET['code']) && is_string($_GET['code']) ? $_GET['code'] : '';
     if (empty($code) || !preg_match('/^[a-z0-9]{4,10}$/', $code)) {
         echo json_encode(['verified' => false]);
         exit;
     }
-    $proofs = file_exists($dbFile) ? (json_decode(file_get_contents($dbFile), true) ?: []) : [];
+    $rawProofs = file_exists($dbFile) ? file_get_contents($dbFile) : null;
+    $decodedProofs = is_string($rawProofs) ? json_decode($rawProofs, true) : [];
+    $proofs = is_array($decodedProofs) ? $decodedProofs : [];
     if (isset($proofs[$code])) {
-        echo json_encode(array_merge(['verified' => true], $proofs[$code]));
+        $response = ['verified' => true];
+        $proofEntry = $proofs[$code];
+        if (is_array($proofEntry)) {
+            foreach ($proofEntry as $k => $v) {
+                if (is_string($k)) {
+                    $response[$k] = $v;
+                }
+            }
+        }
+        echo json_encode($response);
     } else {
         echo json_encode(['verified' => false]);
     }
@@ -51,15 +62,16 @@ if (!check_rate_limit('verify_post', 10, 3600)) {
     exit;
 }
 
-$input = json_decode(file_get_contents('php://input'), true);
-if (!$input) {
+$rawInput = file_get_contents('php://input');
+$input = is_string($rawInput) ? json_decode($rawInput, true) : null;
+if (!is_array($input)) {
     http_response_code(400);
     echo json_encode(['error' => 'Invalid JSON']);
     exit;
 }
 
-$code = $input['code'] ?? '';
-$txHash = $input['tx_hash'] ?? '';
+$code = isset($input['code']) && is_string($input['code']) ? $input['code'] : '';
+$txHash = isset($input['tx_hash']) && is_string($input['tx_hash']) ? $input['tx_hash'] : '';
 $amount = floatval($input['amount'] ?? 0);
 $confirmations = intval($input['confirmations'] ?? 0);
 
@@ -82,7 +94,9 @@ if (!file_exists($urlsFile)) {
     echo json_encode(['error' => 'Invoice not found']);
     exit;
 }
-$urls = json_decode(file_get_contents($urlsFile), true) ?: [];
+$rawUrls = file_get_contents($urlsFile);
+$decodedUrls = is_string($rawUrls) ? json_decode($rawUrls, true) : [];
+$urls = is_array($decodedUrls) ? $decodedUrls : [];
 if (!isset($urls[$code])) {
     http_response_code(404);
     echo json_encode(['error' => 'Invoice not found']);
@@ -91,6 +105,9 @@ if (!isset($urls[$code])) {
 
 // Store proof with atomic lock
 [$fp, $proofs] = read_json_locked($dbFile);
+if (!is_array($proofs)) {
+    $proofs = [];
+}
 
 $status = ($input['status'] ?? 'paid') === 'pending' ? 'pending' : 'paid';
 

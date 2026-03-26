@@ -40,9 +40,11 @@ $now = time();
 $rateData = [];
 
 if (file_exists($rateFile)) {
-    $rateData = json_decode(file_get_contents($rateFile), true) ?: [];
+    $rawRate = file_get_contents($rateFile);
+    $decodedRate = is_string($rawRate) ? json_decode($rawRate, true) : [];
+    $rateData = is_array($decodedRate) ? $decodedRate : [];
     // Clean old entries
-    $rateData = array_filter($rateData, fn($t) => $t > $now - 60);
+    $rateData = array_values(array_filter($rateData, fn($t) => is_numeric($t) && (int)$t > $now - 60));
 }
 
 if (count($rateData) >= 60) {
@@ -55,15 +57,16 @@ $rateData[] = $now;
 file_put_contents($rateFile, json_encode($rateData));
 
 // Parse request
-$input = json_decode(file_get_contents('php://input'), true);
-if (!$input || !isset($input['method'])) {
+$rawInput = file_get_contents('php://input');
+$input = is_string($rawInput) ? json_decode($rawInput, true) : null;
+if (!is_array($input) || !isset($input['method']) || !is_string($input['method'])) {
     http_response_code(400);
     echo json_encode(['error' => 'Missing method']);
     exit;
 }
 
 $method = $input['method'];
-$params = $input['params'] ?? [];
+$params = isset($input['params']) && is_array($input['params']) ? $input['params'] : [];
 
 // Determine endpoint type
 $isJsonRpc = in_array($method, $ALLOWED_JSON_RPC);
@@ -79,8 +82,9 @@ if (!$isJsonRpc && !$isHttp) {
 $cacheFile = __DIR__ . '/../data/node_cache.json';
 $cachedNode = null;
 if (file_exists($cacheFile)) {
-    $cache = json_decode(file_get_contents($cacheFile), true);
-    if ($cache && ($cache['time'] ?? 0) > $now - 300) {
+    $rawCache = file_get_contents($cacheFile);
+    $cache = is_string($rawCache) ? json_decode($rawCache, true) : null;
+    if (is_array($cache) && ($cache['time'] ?? 0) > $now - 300 && isset($cache['node']) && is_string($cache['node'])) {
         $cachedNode = $cache['node'];
     }
 }
@@ -108,6 +112,10 @@ foreach ($orderedNodes as $node) {
     }
 
     $ch = curl_init($url);
+    if ($ch === false) {
+        $lastError = 'cURL init failed';
+        continue;
+    }
     curl_setopt_array($ch, [
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => $body,

@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     exit;
 }
 
-$code = $_GET['code'] ?? '';
+$code = isset($_GET['code']) && is_string($_GET['code']) ? $_GET['code'] : '';
 if (empty($code) || !preg_match('/^[a-z0-9]{4,10}$/', $code)) {
     http_response_code(400);
     echo json_encode(['error' => 'Invalid code']);
@@ -32,7 +32,9 @@ if (!file_exists($dbFile)) {
     exit;
 }
 
-$urls = json_decode(file_get_contents($dbFile), true) ?: [];
+$rawUrls = file_get_contents($dbFile);
+$decodedUrls = is_string($rawUrls) ? json_decode($rawUrls, true) : [];
+$urls = is_array($decodedUrls) ? $decodedUrls : [];
 if (!isset($urls[$code])) {
     http_response_code(404);
     echo json_encode(['error' => 'Invoice not found']);
@@ -40,7 +42,8 @@ if (!isset($urls[$code])) {
 }
 
 $data = $urls[$code];
-$hash = is_array($data) ? $data['h'] : $data;
+$hash = is_array($data) ? ($data['h'] ?? '') : $data;
+$hash = is_string($hash) ? $hash : '';
 $signature = is_array($data) ? $data['s'] : null;
 
 // Re-derive expected signature so client can verify

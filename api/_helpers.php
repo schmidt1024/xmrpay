@@ -33,7 +33,10 @@ function verify_origin(): void {
 function get_hmac_secret(): string {
     $secretFile = __DIR__ . '/../data/secret.key';
     if (file_exists($secretFile)) {
-        return trim(file_get_contents($secretFile));
+        $raw = file_get_contents($secretFile);
+        if (is_string($raw) && $raw !== '') {
+            return trim($raw);
+        }
     }
     $secret = bin2hex(random_bytes(32));
     $dir = dirname($secretFile);
@@ -53,8 +56,10 @@ function check_rate_limit(string $action, int $limit, int $window_seconds): bool
     $now = time();
     $times = [];
     if (file_exists($rateFile)) {
-        $times = json_decode(file_get_contents($rateFile), true) ?: [];
-        $times = array_values(array_filter($times, fn($t) => $t > $now - $window_seconds));
+        $raw = file_get_contents($rateFile);
+        $decoded = is_string($raw) ? json_decode($raw, true) : [];
+        $times = is_array($decoded) ? $decoded : [];
+        $times = array_values(array_filter($times, fn($t) => is_numeric($t) && (int)$t > $now - $window_seconds));
     }
     if (count($times) >= $limit) return false;
     $times[] = $now;
@@ -68,9 +73,15 @@ function read_json_locked(string $file): array {
     $dir = dirname($file);
     if (!is_dir($dir)) mkdir($dir, 0750, true);
     $fp = fopen($file, 'c+');
+    if ($fp === false) {
+        throw new RuntimeException('Unable to open file: ' . $file);
+    }
     flock($fp, LOCK_EX);
     $size = filesize($file);
-    $data = ($size > 0) ? (json_decode(fread($fp, $size), true) ?: []) : [];
+    $size = is_int($size) ? $size : 0;
+    $raw = $size > 0 ? fread($fp, $size) : '';
+    $decoded = is_string($raw) ? json_decode($raw, true) : [];
+    $data = is_array($decoded) ? $decoded : [];
     return [$fp, $data];
 }
 

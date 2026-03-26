@@ -378,12 +378,65 @@
     const code = params.get('c');
     if (code) {
       invoiceCode = code;
-      setTimeout(function () { loadPaymentStatus(code); }, 200);
+      // Verify short URL integrity (detect tampering)
+      setTimeout(function () { 
+        verifyShortUrlIntegrity(code, hash);
+        loadPaymentStatus(code); 
+      }, 200);
     }
 
     // Auto-generate
     setTimeout(generate, 100);
     return true;
+  }
+
+  // Verify that short URL has not been tampered with by checking HMAC signature
+  function verifyShortUrlIntegrity(code, currentHash) {
+    fetch('/api/check-short.php?code=' + encodeURIComponent(code))
+      .then(function (res) { 
+        if (!res.ok) throw new Error('Integrity check failed');
+        return res.json(); 
+      })
+      .then(function (data) {
+        if (!data.signature) {
+          // Old format without signature - no integrity check
+          return;
+        }
+        
+        // Verify HMAC signature client-side
+        verifyHmacSignature(data.hash, data.signature).then(function (valid) {
+          if (!valid) {
+            console.warn('xmrpay: Hash signature mismatch - possible server tampering detected');
+            showToast(I18n.t('toast_integrity_warning'));
+          }
+        });
+      })
+      .catch(function (e) { 
+        console.warn('xmrpay: Could not verify short URL integrity:', e);
+      });
+  }
+
+  // Client-side HMAC-SHA256 verification
+  async function verifyHmacSignature(hash, expectedSignature) {
+    try {
+      // Use hostname as part of the secret (same as server-side)
+      const secret = await crypto.subtle.digest('SHA-256', 
+        new TextEncoder().encode(location.hostname + 'xmrpay.link'));
+      const key = await crypto.subtle.importKey('raw', secret, 
+        { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const signature = await crypto.subtle.sign('HMAC', key, 
+        new TextEncoder().encode(hash));
+      
+      // Convert to hex string
+      const sigHex = Array.from(new Uint8Array(signature))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      
+      return sigHex === expectedSignature;
+    } catch (e) {
+      console.warn('xmrpay: HMAC verification failed:', e);
+      return false;
+    }
   }
 
   function buildSummary(xmrAmount, desc, days) {

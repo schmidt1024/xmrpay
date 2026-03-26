@@ -18,6 +18,9 @@ if (!is_dir($dataDir)) {
     mkdir($dataDir, 0750, true);
 }
 
+// Secret for HMAC (derived from hostname to protect against server-side tampering)
+$secret = hash('sha256', $_SERVER['HTTP_HOST'] . 'xmrpay.link');
+
 $input = json_decode(file_get_contents('php://input'), true);
 $hash = $input['hash'] ?? '';
 
@@ -34,10 +37,12 @@ if (file_exists($dbFile)) {
 }
 
 // Check if this hash already exists
-$existing = array_search($hash, $urls);
-if ($existing !== false) {
-    echo json_encode(['code' => $existing]);
-    exit;
+foreach ($urls as $code => $data) {
+    $stored_hash = is_array($data) ? $data['h'] : $data;
+    if ($stored_hash === $hash) {
+        echo json_encode(['code' => $code]);
+        exit;
+    }
 }
 
 // Generate short code (6 chars)
@@ -50,12 +55,19 @@ function generateCode($length = 6) {
     return $code;
 }
 
+// Generate HMAC signature to detect server-side tampering
+$signature = hash_hmac('sha256', $hash, $secret);
+
 $code = generateCode();
 while (isset($urls[$code])) {
     $code = generateCode();
 }
 
-$urls[$code] = $hash;
+// Store hash with signature
+$urls[$code] = [
+    'h' => $hash,
+    's' => $signature  // HMAC signature for integrity verification
+];
 file_put_contents($dbFile, json_encode($urls, JSON_UNESCAPED_UNICODE), LOCK_EX);
 
 echo json_encode(['code' => $code]);

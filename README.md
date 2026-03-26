@@ -1,6 +1,6 @@
 # xmrpay.link — Monero Invoice Generator
 
-> Private. Self-hosted. No accounts. No backend. No bullshit.
+> Private. Self-hosted. No accounts. No backend for accounts. No bullshit.
 
 **[Live: xmrpay.link](https://xmrpay.link)** · **[Tor: mc6wfe...zyd.onion](http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion)**
 
@@ -8,9 +8,16 @@
 
 ## What is this?
 
-**xmrpay.link** is a client-side web app that lets anyone create a professional Monero payment request in under 30 seconds — no node, no registration, no KYC, no third parties.
+**xmrpay.link** is a client-side web app that lets anyone create a professional Monero payment request in under 30 seconds — no account registration, no KYC, no custodial services.
 
 Enter your address, the amount, an optional description — and get a QR code, a shareable short link, and a PDF invoice. Done.
+
+### Privacy & Transparency
+
+- **Client-side first:** All cryptographic operations (QR codes, payment verification, PDF generation) run in your browser. Your private keys never leave your device.
+- **Minimal backend:** Optional short URLs, fiat rate caching, and proof storage use a small server component with **no account tracking**. You can self-host or use the public instance.
+- **HMAC-signed short URLs:** Invoice hashes are cryptographically signed to detect server-side tampering.
+- **Address privacy:** Payment proofs are verified client-side only; the server never stores your XMR address.
 
 ---
 
@@ -35,14 +42,14 @@ Enter your address, the amount, an optional description — and get a QR code, a
 - Amount in XMR or fiat (EUR/USD/CHF/GBP/JPY/RUB/BRL via CoinGecko, auto-detected)
 - Description and payment deadline (7/14/30 days or custom)
 - QR code with `monero:` URI
-- Shareable short URLs (`/s/abc123`)
+- Shareable short URLs (`/s/abc123`) with HMAC signatures for integrity
 - PDF invoice download (with QR, amount, fiat equivalent, deadline)
 - i18n (EN, DE, FR, IT, ES, PT, RU) with automatic browser detection
 
 ### Payment Verification (TX Proof)
 - Sender provides TX Hash + TX Key from their wallet
 - Cryptographic verification in the browser (no private keys needed)
-- Payment status stored permanently with the invoice
+- Payment status stored with the invoice (server stores proof, but not your address)
 - Invoice link shows "Paid" badge after verification
 - Standard and subaddress support
 

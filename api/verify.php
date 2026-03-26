@@ -3,6 +3,10 @@
  * TX Proof Storage API
  * POST: Store verified payment proof for an invoice
  * GET:  Retrieve payment status for an invoice
+ * 
+ * Privacy note: Only stores TX hash, amount, and confirmations.
+ * Payee address is NOT stored — verification happens client-side only.
+ * This prevents any server-side leakage of payment recipient information.
  */
 
 header('Content-Type: application/json');

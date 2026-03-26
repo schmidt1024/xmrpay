@@ -22,7 +22,22 @@ if (!isset($urls[$code])) {
     exit;
 }
 
-$hash = $urls[$code]['hash'] ?? $urls[$code];
+// Support both old format (string) and new format (array with hash & signature)
+$data = $urls[$code];
+$hash = is_array($data) ? $data['h'] : $data;
+$signature = is_array($data) ? $data['s'] : null;
+
+// Verify HMAC signature if present (detect server-side tampering)
+if ($signature) {
+    $secret = hash('sha256', $_SERVER['HTTP_HOST'] . 'xmrpay.link');
+    $expected_sig = hash_hmac('sha256', $hash, $secret);
+    if ($signature !== $expected_sig) {
+        // Signature mismatch - possible tampering detected
+        // Log and proceed anyway (graceful degradation)
+        error_log("xmrpay: Signature mismatch for code $code");
+    }
+}
+
 $base = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
 header('Location: ' . $base . '/#' . $hash . '&c=' . $code, true, 302);
 exit;

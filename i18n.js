@@ -11,7 +11,7 @@ var I18n = (function () {
     ru: { name: 'Русский' }
   };
 
-  var footer = 'Open Source &middot; No Backend &middot; No KYC &middot; <a href="https://gitea.schmidt.eco/schmidt1024/xmrpay.link" target="_blank">Source</a> &middot; <a href="http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion" title="Tor Hidden Service">Onion</a>';
+  var footer = 'Open Source &middot; Minimal Backend &middot; No KYC &middot; <a href="https://gitea.schmidt.eco/schmidt1024/xmrpay.link" target="_blank">Source</a> &middot; <a href="http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion" title="Tor Hidden Service">Onion</a>';
 
   var translations = {
     en: {
@@ -58,7 +58,8 @@ var I18n = (function () {
       proof_no_match: 'No matching output — TX key or address mismatch',
       proof_tx_not_found: 'Transaction not found',
       proof_error: 'Verification error',
-      status_paid: 'Paid'
+      status_paid: 'Paid',
+      toast_integrity_warning: 'Warning: signature mismatch detected'
     },
     de: {
       subtitle: 'Monero-Zahlungsanforderung in Sekunden',
@@ -104,7 +105,8 @@ var I18n = (function () {
       proof_no_match: 'Kein passender Output — TX Key oder Adresse stimmt nicht',
       proof_tx_not_found: 'Transaktion nicht gefunden',
       proof_error: 'Fehler bei der Verifizierung',
-      status_paid: 'Bezahlt'
+      status_paid: 'Bezahlt',
+      toast_integrity_warning: 'Warnung: Signatur-Nichtübereinstimmung erkannt'
     },
     fr: {
       subtitle: 'Demande de paiement Monero en quelques secondes',
@@ -150,7 +152,8 @@ var I18n = (function () {
       proof_no_match: 'Aucun output correspondant — TX Key ou adresse incorrecte',
       proof_tx_not_found: 'Transaction introuvable',
       proof_error: 'Erreur de vérification',
-      status_paid: 'Payé'
+      status_paid: 'Payé',
+      toast_integrity_warning: 'Avertissement : détection d\'une non-concordance de signature'
     },
     it: {
       subtitle: 'Richiesta di pagamento Monero in pochi secondi',
@@ -196,7 +199,8 @@ var I18n = (function () {
       proof_no_match: 'Nessun output corrispondente — TX Key o indirizzo errato',
       proof_tx_not_found: 'Transazione non trovata',
       proof_error: 'Errore di verifica',
-      status_paid: 'Pagato'
+      status_paid: 'Pagato',
+      toast_integrity_warning: 'Avviso: rilevata mancata corrispondenza della firma'
     },
     es: {
       subtitle: 'Solicitud de pago Monero en segundos',
@@ -242,7 +246,8 @@ var I18n = (function () {
       proof_no_match: 'Ningún output coincidente — TX Key o dirección incorrecta',
       proof_tx_not_found: 'Transacción no encontrada',
       proof_error: 'Error de verificación',
-      status_paid: 'Pagado'
+      status_paid: 'Pagado',
+      toast_integrity_warning: 'Advertencia: desajuste de firma detectado'
     },
     pt: {
       subtitle: 'Pedido de pagamento Monero em segundos',
@@ -288,7 +293,8 @@ var I18n = (function () {
       proof_no_match: 'Nenhum output correspondente — TX Key ou endereço incorreto',
       proof_tx_not_found: 'Transação não encontrada',
       proof_error: 'Erro de verificação',
-      status_paid: 'Pago'
+      status_paid: 'Pago',
+      toast_integrity_warning: 'Aviso: incompatibilidade de assinatura detectada'
     },
     ru: {
       subtitle: 'Запрос на оплату Monero за секунды',
@@ -334,7 +340,8 @@ var I18n = (function () {
       proof_no_match: 'Соответствующий выход не найден — неверный TX Key или адрес',
       proof_tx_not_found: 'Транзакция не найдена',
       proof_error: 'Ошибка проверки',
-      status_paid: 'Оплачено'
+      status_paid: 'Оплачено',
+      toast_integrity_warning: 'Предупреждение: обнаружено несоответствие подписи'
     }
   };
 

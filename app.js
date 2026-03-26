@@ -458,6 +458,7 @@
       html += '<div class="summary-desc">' + desc.replace(/</g, '&lt;') + '</div>';
     }
     paymentSummary.innerHTML = html;
+    paymentSummary.classList.remove('paid-confirmed');
   }
 
   function updatePageTitle(xmrAmount, desc) {
@@ -938,6 +939,10 @@
   }
 
   function showPaidStatus(data) {
+    if (!data.verified_at) {
+      data = Object.assign({}, data, { verified_at: Math.floor(Date.now() / 1000) });
+    }
+
     paymentStatus.className = 'payment-status paid';
 
     // Stamp over QR + dim QR
@@ -962,13 +967,13 @@
           year: 'numeric', month: 'long', day: 'numeric'
         });
       }
-      hint.textContent = data.amount.toFixed(6) + ' XMR — TX ' +
-        data.tx_hash.substring(0, 8) + '...' + dateStr;
+      hint.textContent = 'TX ' + data.tx_hash.substring(0, 8) + '...' + dateStr;
       hint.className = 'qr-hint paid-info';
     }
 
     paymentStatus.innerHTML = '';
     lastPaidData = data;
+    paymentSummary.classList.add('paid-confirmed');
 
     // Hide unnecessary buttons when paid
     openWalletBtn.style.display = 'none';
@@ -981,6 +986,7 @@
   function showPendingStatus(data) {
     var confs = data.confirmations || 0;
     paymentStatus.className = 'payment-status pending';
+    paymentSummary.classList.remove('paid-confirmed');
     qrContainer.classList.add('confirming');
 
     var existingStamp = qrContainer.querySelector('.paid-stamp');
@@ -993,8 +999,10 @@
     existingStamp.textContent = confs === 0 ? I18n.t('status_pending') : (confs + '/10');
 
     var hint = qrContainer.querySelector('.qr-hint');
-    if (hint && !hint.classList.contains('paid-info')) {
-      hint.textContent = data.amount.toFixed(6) + ' XMR — TX ' + data.tx_hash.substring(0, 8) + '...';
+    if (hint) {
+      hint.textContent = 'TX ' + data.tx_hash.substring(0, 8) + '... — ' +
+        (confs === 0 ? I18n.t('status_pending') : (confs + '/10'));
+      hint.className = 'qr-hint pending-info';
     }
   }
 

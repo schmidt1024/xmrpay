@@ -403,6 +403,10 @@ textarea {
   font-family: var(--mono);
 }
 
+.payment-summary.paid-confirmed .summary-amount {
+  color: var(--success);
+}
+
 .summary-fiat {
   font-size: 0.85rem;
   color: var(--text-muted);
@@ -613,6 +617,12 @@ textarea {
 
 .paid-info {
   color: var(--success);
+  font-size: 0.75rem;
+  font-family: var(--mono);
+}
+
+.pending-info {
+  color: #f59e0b;
   font-size: 0.75rem;
   font-family: var(--mono);
 }

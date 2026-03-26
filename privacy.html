@@ -3,278 +3,232 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>xmrpay.link - Privacy and Terms</title>
+  <title>xmrpay.link — Privacy & Terms</title>
   <meta name="description" content="Privacy policy and terms of use for xmrpay.link.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
   <style>
-    :root {
-      --bg: #0d0d0d;
-      --card: #1a1a1a;
-      --border: #333;
-      --text: #e0e0e0;
-      --muted: #a0a0a0;
-      --accent: #e87830;
-      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    main.legal-main {
+      max-width: 920px;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
+    .legal-card {
       line-height: 1.55;
     }
-    main {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 24px 16px 64px;
+    .legal-card h2 {
+      margin-bottom: 0.4rem;
+      color: var(--accent-text);
+      font-size: 1.2rem;
     }
-    .top {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .back {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    h1 {
-      margin: 0 0 6px;
-      font-size: 1.8rem;
-    }
-    .intro {
-      color: var(--muted);
-      margin: 0 0 16px;
-      font-size: 0.95rem;
-    }
-    .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .tab {
-      border: 1px solid var(--border);
-      background: var(--card);
+    .legal-card h3 {
+      margin: 1rem 0 0.4rem;
+      font-size: 1rem;
       color: var(--text);
-      border-radius: 8px;
-      padding: 6px 10px;
-      cursor: pointer;
-      font-size: 0.85rem;
     }
-    .tab.active {
-      border-color: var(--accent);
-      color: var(--accent);
+    .legal-card p,
+    .legal-card li {
+      color: var(--text-muted);
+      font-size: 0.92rem;
     }
-    .lang {
+    .legal-card ul {
+      margin: 0 0 0 1.2rem;
+      padding: 0;
+    }
+    .legal-card li {
+      margin-bottom: 0.35rem;
+    }
+    .legal-lang {
       display: none;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
     }
-    .lang.active { display: block; }
-    h2 { margin: 0 0 10px; font-size: 1.2rem; }
-    h3 { margin: 16px 0 8px; font-size: 1rem; }
-    ul { margin: 0 0 0 20px; padding: 0; }
-    li { margin-bottom: 6px; }
-    p { margin: 0 0 10px; }
-    .note { color: var(--muted); font-size: 0.9rem; margin-top: 10px; }
+    .legal-lang.active {
+      display: block;
+    }
+    .legal-top-link {
+      display: inline-block;
+      margin-bottom: 0.75rem;
+      color: var(--accent-text);
+    }
   </style>
 </head>
 <body>
-  <main>
-    <div class="top">
-      <a class="back" href="/">&larr; xmrpay.link</a>
+  <header>
+    <h1><a href="/" id="homeLink">xmr<span>pay</span>.link</a></h1>
+    <p>Privacy &amp; Terms</p>
+  </header>
+
+  <main class="legal-main">
+    <div class="card legal-card">
+      <a class="legal-top-link" href="/">&larr; Back to invoice generator</a>
+
+      <section class="legal-lang" data-lang="en">
+        <h2>English</h2>
+        <h3>Privacy Policy</h3>
+        <p>xmrpay.link is designed to minimize data collection. No account is required.</p>
+        <ul>
+          <li><strong>Rate limiting:</strong> temporary IP-based records are stored to protect the API from abuse.</li>
+          <li><strong>Short links:</strong> invoice hash data is stored for generated short URLs.</li>
+          <li><strong>Payment proof:</strong> if used, tx hash, amount, confirmations and timestamp are stored. No Monero address is stored in the proof database.</li>
+          <li><strong>No tracking:</strong> no analytics, no ads, no profiling.</li>
+        </ul>
+        <h3>Terms of Use</h3>
+        <ul>
+          <li>Service is provided "as is" without warranties.</li>
+          <li>You are responsible for legal compliance in your jurisdiction.</li>
+          <li>Abuse, unlawful usage or attacks against the service are prohibited.</li>
+          <li>Availability is not guaranteed; features may change at any time.</li>
+        </ul>
+      </section>
+
+      <section class="legal-lang" data-lang="de">
+        <h2>Deutsch</h2>
+        <h3>Datenschutzerklaerung</h3>
+        <p>xmrpay.link ist auf minimale Datenerhebung ausgelegt. Es ist kein Konto erforderlich.</p>
+        <ul>
+          <li><strong>Rate-Limiting:</strong> temporaere IP-basierte Eintraege werden zum Schutz der API gespeichert.</li>
+          <li><strong>Kurzlinks:</strong> Rechnungs-Hash-Daten werden fuer erzeugte Kurzlinks gespeichert.</li>
+          <li><strong>Zahlungsnachweis:</strong> falls genutzt, werden TX-Hash, Betrag, Bestaetigungen und Zeitstempel gespeichert. Keine Monero-Adresse wird in der Proof-Datenbank gespeichert.</li>
+          <li><strong>Kein Tracking:</strong> keine Analytics, keine Werbung, kein Profiling.</li>
+        </ul>
+        <h3>Nutzungsbedingungen</h3>
+        <ul>
+          <li>Der Dienst wird ohne Gewaehr bereitgestellt.</li>
+          <li>Du bist fuer die Einhaltung der Gesetze in deiner Jurisdiktion verantwortlich.</li>
+          <li>Missbrauch, rechtswidrige Nutzung oder Angriffe auf den Dienst sind verboten.</li>
+          <li>Die Verfuegbarkeit ist nicht garantiert; Funktionen koennen jederzeit geaendert werden.</li>
+        </ul>
+      </section>
+
+      <section class="legal-lang" data-lang="fr">
+        <h2>Francais</h2>
+        <h3>Politique de confidentialite</h3>
+        <p>xmrpay.link est concu pour minimiser la collecte de donnees. Aucun compte n'est requis.</p>
+        <ul>
+          <li><strong>Limitation de debit:</strong> des enregistrements temporaires bases sur l'IP sont stockes pour proteger l'API.</li>
+          <li><strong>Liens courts:</strong> les donnees de hachage de facture sont stockees pour les liens courts generes.</li>
+          <li><strong>Preuve de paiement:</strong> si utilisee, le hash tx, le montant, les confirmations et l'horodatage sont stockes. Aucune adresse Monero n'est stockee dans la base de preuves.</li>
+          <li><strong>Pas de suivi:</strong> pas d'analytics, pas de publicite, pas de profilage.</li>
+        </ul>
+        <h3>Conditions d'utilisation</h3>
+        <ul>
+          <li>Le service est fourni "tel quel" sans garantie.</li>
+          <li>Vous etes responsable du respect des lois de votre juridiction.</li>
+          <li>Les abus, l'utilisation illegale ou les attaques contre le service sont interdits.</li>
+          <li>La disponibilite n'est pas garantie; les fonctionnalites peuvent changer a tout moment.</li>
+        </ul>
+      </section>
+
+      <section class="legal-lang" data-lang="it">
+        <h2>Italiano</h2>
+        <h3>Informativa sulla privacy</h3>
+        <p>xmrpay.link e progettato per ridurre al minimo la raccolta dati. Non e richiesto alcun account.</p>
+        <ul>
+          <li><strong>Rate limiting:</strong> vengono salvati record temporanei basati su IP per proteggere l'API dagli abusi.</li>
+          <li><strong>Link brevi:</strong> i dati hash della fattura vengono salvati per i link brevi generati.</li>
+          <li><strong>Prova di pagamento:</strong> se usata, vengono salvati tx hash, importo, conferme e timestamp. Nessun indirizzo Monero viene salvato nel database delle prove.</li>
+          <li><strong>Nessun tracciamento:</strong> niente analytics, niente pubblicita, niente profilazione.</li>
+        </ul>
+        <h3>Termini di utilizzo</h3>
+        <ul>
+          <li>Il servizio e fornito "cosi com'e" senza garanzie.</li>
+          <li>Sei responsabile del rispetto delle leggi della tua giurisdizione.</li>
+          <li>Abusi, uso illecito o attacchi al servizio sono vietati.</li>
+          <li>La disponibilita non e garantita; le funzionalita possono cambiare in qualsiasi momento.</li>
+        </ul>
+      </section>
+
+      <section class="legal-lang" data-lang="es">
+        <h2>Espanol</h2>
+        <h3>Politica de privacidad</h3>
+        <p>xmrpay.link esta disenado para minimizar la recopilacion de datos. No se requiere cuenta.</p>
+        <ul>
+          <li><strong>Limitacion de tasa:</strong> se almacenan registros temporales basados en IP para proteger la API del abuso.</li>
+          <li><strong>Enlaces cortos:</strong> se almacenan datos hash de factura para enlaces cortos generados.</li>
+          <li><strong>Prueba de pago:</strong> si se usa, se almacenan tx hash, monto, confirmaciones y marca temporal. No se almacena ninguna direccion Monero en la base de pruebas.</li>
+          <li><strong>Sin rastreo:</strong> sin analytics, sin anuncios, sin perfilado.</li>
+        </ul>
+        <h3>Terminos de uso</h3>
+        <ul>
+          <li>El servicio se ofrece "tal cual" sin garantias.</li>
+          <li>Eres responsable de cumplir las leyes de tu jurisdiccion.</li>
+          <li>Se prohibe el abuso, uso ilegal o ataques contra el servicio.</li>
+          <li>La disponibilidad no esta garantizada; las funciones pueden cambiar en cualquier momento.</li>
+        </ul>
+      </section>
+
+      <section class="legal-lang" data-lang="pt">
+        <h2>Portugues</h2>
+        <h3>Politica de privacidade</h3>
+        <p>xmrpay.link foi projetado para minimizar a coleta de dados. Nao e necessaria conta.</p>
+        <ul>
+          <li><strong>Limite de taxa:</strong> registros temporarios baseados em IP sao armazenados para proteger a API contra abuso.</li>
+          <li><strong>Links curtos:</strong> dados hash da fatura sao armazenados para links curtos gerados.</li>
+          <li><strong>Comprovacao de pagamento:</strong> se usada, tx hash, valor, confirmacoes e carimbo de data/hora sao armazenados. Nenhum endereco Monero e armazenado no banco de comprovacoes.</li>
+          <li><strong>Sem rastreamento:</strong> sem analytics, sem anuncios, sem perfilamento.</li>
+        </ul>
+        <h3>Termos de uso</h3>
+        <ul>
+          <li>O servico e fornecido "como esta" sem garantias.</li>
+          <li>Voce e responsavel por cumprir as leis da sua jurisdicao.</li>
+          <li>Abuso, uso ilegal ou ataques contra o servico sao proibidos.</li>
+          <li>A disponibilidade nao e garantida; recursos podem mudar a qualquer momento.</li>
+        </ul>
+      </section>
+
+      <section class="legal-lang" data-lang="ru">
+        <h2>Russkiy</h2>
+        <h3>Politika konfidentsialnosti</h3>
+        <p>xmrpay.link sozdan s minimalnym sborom dannykh. Akkount ne trebuetsya.</p>
+        <ul>
+          <li><strong>Ogranichenie zaprosov:</strong> vremennye IP-zapisi sokhranyayutsya dlya zashchity API ot zloupotrebleniy.</li>
+          <li><strong>Korotkie ssylki:</strong> khesh-dannye scheta sokhranyayutsya dlya sozdannykh korotkikh ssylok.</li>
+          <li><strong>Podtverzhdenie platezha:</strong> pri ispolzovanii sokhranyayutsya tx hash, summa, podtverzhdeniya i metka vremeni. Adres Monero v baze podtverzhdeniy ne khranitsya.</li>
+          <li><strong>Bez trekinga:</strong> bez analitiki, bez reklamy, bez profilirovaniya.</li>
+        </ul>
+        <h3>Usloviya ispolzovaniya</h3>
+        <ul>
+          <li>Servis predostavlyaetsya "kak est" bez garantiy.</li>
+          <li>Vy nesete otvetstvennost za soblyudenie zakonov vashey yurisdiktsii.</li>
+          <li>Zloupotrebleniya, nezakonnoe ispolzovanie i ataki na servis zapreshcheny.</li>
+          <li>Dostupnost ne garantiruetsya; funktsii mogut izmenyatsya v lyuboe vremya.</li>
+        </ul>
+      </section>
+
+      <p style="margin-top:1rem;color:var(--text-muted);font-size:0.82rem;">Last updated: 2026-03-26</p>
     </div>
-
-    <h1>Privacy &amp; Terms</h1>
-    <p class="intro">Select your language. This page explains data handling and terms of use for xmrpay.link.</p>
-
-    <div class="tabs" id="tabs">
-      <button class="tab" data-lang="en">English</button>
-      <button class="tab" data-lang="de">Deutsch</button>
-      <button class="tab" data-lang="fr">Français</button>
-      <button class="tab" data-lang="it">Italiano</button>
-      <button class="tab" data-lang="es">Español</button>
-      <button class="tab" data-lang="pt">Português</button>
-      <button class="tab" data-lang="ru">Русский</button>
-    </div>
-
-    <section class="lang" data-lang="en">
-      <h2>English</h2>
-      <h3>Privacy Policy</h3>
-      <p>xmrpay.link is designed to minimize data collection. No account is required.</p>
-      <ul>
-        <li><strong>Rate limiting:</strong> temporary IP-based records are stored in server files to protect the API from abuse.</li>
-        <li><strong>Short links:</strong> invoice hash data is stored for generated short URLs.</li>
-        <li><strong>Payment proof:</strong> if used, tx hash, amount, confirmations and timestamp are stored. No Monero address is stored in the proof database.</li>
-        <li><strong>No tracking:</strong> no analytics, no ads, no profiling.</li>
-      </ul>
-      <h3>Terms of Use</h3>
-      <ul>
-        <li>Service is provided "as is" without warranties.</li>
-        <li>You are responsible for legal compliance in your jurisdiction.</li>
-        <li>Abuse, unlawful usage or attacks against the service are prohibited.</li>
-        <li>Availability is not guaranteed; features may change at any time.</li>
-      </ul>
-    </section>
-
-    <section class="lang" data-lang="de">
-      <h2>Deutsch</h2>
-      <h3>Datenschutzerklärung</h3>
-      <p>xmrpay.link ist auf minimale Datenerhebung ausgelegt. Es ist kein Konto erforderlich.</p>
-      <ul>
-        <li><strong>Rate-Limiting:</strong> temporäre IP-basierte Einträge werden zum Schutz der API gespeichert.</li>
-        <li><strong>Kurzlinks:</strong> Rechnungs-Hash-Daten werden für erzeugte Kurzlinks gespeichert.</li>
-        <li><strong>Zahlungsnachweis:</strong> falls genutzt, werden TX-Hash, Betrag, Bestätigungen und Zeitstempel gespeichert. Keine Monero-Adresse wird in der Proof-Datenbank gespeichert.</li>
-        <li><strong>Kein Tracking:</strong> keine Analytics, keine Werbung, kein Profiling.</li>
-      </ul>
-      <h3>Nutzungsbedingungen</h3>
-      <ul>
-        <li>Der Dienst wird ohne Gewähr bereitgestellt.</li>
-        <li>Du bist für die Einhaltung der Gesetze in deiner Jurisdiktion verantwortlich.</li>
-        <li>Missbrauch, rechtswidrige Nutzung oder Angriffe auf den Dienst sind verboten.</li>
-        <li>Die Verfügbarkeit ist nicht garantiert; Funktionen können jederzeit geändert werden.</li>
-      </ul>
-    </section>
-
-    <section class="lang" data-lang="fr">
-      <h2>Français</h2>
-      <h3>Politique de confidentialité</h3>
-      <p>xmrpay.link est conçu pour minimiser la collecte de données. Aucun compte n'est requis.</p>
-      <ul>
-        <li><strong>Limitation de débit:</strong> des enregistrements temporaires basés sur l'IP sont stockés pour protéger l'API.</li>
-        <li><strong>Liens courts:</strong> les données de hachage de facture sont stockées pour les liens courts générés.</li>
-        <li><strong>Preuve de paiement:</strong> si utilisée, le hash tx, le montant, les confirmations et l'horodatage sont stockés. Aucune adresse Monero n'est stockée dans la base de preuves.</li>
-        <li><strong>Pas de suivi:</strong> pas d'analytics, pas de publicité, pas de profilage.</li>
-      </ul>
-      <h3>Conditions d'utilisation</h3>
-      <ul>
-        <li>Le service est fourni "tel quel" sans garantie.</li>
-        <li>Vous êtes responsable du respect des lois de votre juridiction.</li>
-        <li>Les abus, l'utilisation illégale ou les attaques contre le service sont interdits.</li>
-        <li>La disponibilité n'est pas garantie; les fonctionnalités peuvent changer à tout moment.</li>
-      </ul>
-    </section>
-
-    <section class="lang" data-lang="it">
-      <h2>Italiano</h2>
-      <h3>Informativa sulla privacy</h3>
-      <p>xmrpay.link e progettato per ridurre al minimo la raccolta dati. Non e richiesto alcun account.</p>
-      <ul>
-        <li><strong>Rate limiting:</strong> vengono salvati record temporanei basati su IP per proteggere l'API dagli abusi.</li>
-        <li><strong>Link brevi:</strong> i dati hash della fattura vengono salvati per i link brevi generati.</li>
-        <li><strong>Prova di pagamento:</strong> se usata, vengono salvati tx hash, importo, conferme e timestamp. Nessun indirizzo Monero viene salvato nel database delle prove.</li>
-        <li><strong>Nessun tracciamento:</strong> niente analytics, niente pubblicita, niente profilazione.</li>
-      </ul>
-      <h3>Termini di utilizzo</h3>
-      <ul>
-        <li>Il servizio e fornito "cosi com'e" senza garanzie.</li>
-        <li>Sei responsabile del rispetto delle leggi della tua giurisdizione.</li>
-        <li>Abusi, uso illecito o attacchi al servizio sono vietati.</li>
-        <li>La disponibilita non e garantita; le funzionalita possono cambiare in qualsiasi momento.</li>
-      </ul>
-    </section>
-
-    <section class="lang" data-lang="es">
-      <h2>Español</h2>
-      <h3>Politica de privacidad</h3>
-      <p>xmrpay.link esta diseñado para minimizar la recopilacion de datos. No se requiere cuenta.</p>
-      <ul>
-        <li><strong>Limitacion de tasa:</strong> se almacenan registros temporales basados en IP para proteger la API del abuso.</li>
-        <li><strong>Enlaces cortos:</strong> se almacenan datos hash de factura para enlaces cortos generados.</li>
-        <li><strong>Prueba de pago:</strong> si se usa, se almacenan tx hash, monto, confirmaciones y marca temporal. No se almacena ninguna direccion Monero en la base de pruebas.</li>
-        <li><strong>Sin rastreo:</strong> sin analytics, sin anuncios, sin perfilado.</li>
-      </ul>
-      <h3>Terminos de uso</h3>
-      <ul>
-        <li>El servicio se ofrece "tal cual" sin garantias.</li>
-        <li>Eres responsable de cumplir las leyes de tu jurisdiccion.</li>
-        <li>Se prohibe el abuso, uso ilegal o ataques contra el servicio.</li>
-        <li>La disponibilidad no esta garantizada; las funciones pueden cambiar en cualquier momento.</li>
-      </ul>
-    </section>
-
-    <section class="lang" data-lang="pt">
-      <h2>Português</h2>
-      <h3>Politica de privacidade</h3>
-      <p>xmrpay.link foi projetado para minimizar a coleta de dados. Nao e necessaria conta.</p>
-      <ul>
-        <li><strong>Limite de taxa:</strong> registros temporarios baseados em IP sao armazenados para proteger a API contra abuso.</li>
-        <li><strong>Links curtos:</strong> dados hash da fatura sao armazenados para links curtos gerados.</li>
-        <li><strong>Comprovacao de pagamento:</strong> se usada, tx hash, valor, confirmacoes e carimbo de data/hora sao armazenados. Nenhum endereco Monero e armazenado no banco de comprovacoes.</li>
-        <li><strong>Sem rastreamento:</strong> sem analytics, sem anuncios, sem perfilamento.</li>
-      </ul>
-      <h3>Termos de uso</h3>
-      <ul>
-        <li>O servico e fornecido "como esta" sem garantias.</li>
-        <li>Voce e responsavel por cumprir as leis da sua jurisdicao.</li>
-        <li>Abuso, uso ilegal ou ataques contra o servico sao proibidos.</li>
-        <li>A disponibilidade nao e garantida; recursos podem mudar a qualquer momento.</li>
-      </ul>
-    </section>
-
-    <section class="lang" data-lang="ru">
-      <h2>Русский</h2>
-      <h3>Политика конфиденциальности</h3>
-      <p>xmrpay.link создан с минимальным сбором данных. Аккаунт не требуется.</p>
-      <ul>
-        <li><strong>Ограничение запросов:</strong> временные IP-записи сохраняются для защиты API от злоупотреблений.</li>
-        <li><strong>Короткие ссылки:</strong> хеш-данные счета сохраняются для созданных коротких ссылок.</li>
-        <li><strong>Подтверждение платежа:</strong> при использовании сохраняются tx hash, сумма, подтверждения и метка времени. Адрес Monero в базе подтверждений не хранится.</li>
-        <li><strong>Без трекинга:</strong> без аналитики, без рекламы, без профилирования.</li>
-      </ul>
-      <h3>Условия использования</h3>
-      <ul>
-        <li>Сервис предоставляется "как есть" без гарантий.</li>
-        <li>Вы несете ответственность за соблюдение законов вашей юрисдикции.</li>
-        <li>Злоупотребления, незаконное использование и атаки на сервис запрещены.</li>
-        <li>Доступность не гарантируется; функции могут изменяться в любое время.</li>
-      </ul>
-    </section>
-
-    <p class="note">Last updated: 2026-03-26</p>
   </main>
 
-  <script>
-    (function () {
-      var sections = Array.prototype.slice.call(document.querySelectorAll('.lang'));
-      var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
-      var supported = ['en', 'de', 'fr', 'it', 'es', 'pt', 'ru'];
+  <footer>
+    <p data-i18n-html="footer">Open Source &middot; No Tracking &middot; No KYC &middot; <a href="https://gitea.schmidt.eco/schmidt1024/xmrpay.link" target="_blank" rel="noopener noreferrer">Source</a> &middot; <a href="http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion" title="Tor Hidden Service">Onion</a> &middot; <a href="/privacy.html">Privacy &amp; Terms</a></p>
+  </footer>
 
-      function setLang(lang) {
-        if (supported.indexOf(lang) === -1) lang = 'en';
-        sections.forEach(function (s) {
-          s.classList.toggle('active', s.getAttribute('data-lang') === lang);
+  <div class="lang-picker" id="langPicker">
+    <button class="lang-toggle" id="langToggle" aria-label="Language">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M2 12h20"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/>
+      </svg>
+    </button>
+    <div class="lang-dropdown" id="langDropdown"></div>
+  </div>
+
+  <script src="i18n.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var supported = ['en', 'de', 'fr', 'it', 'es', 'pt', 'ru'];
+      var sections = document.querySelectorAll('.legal-lang');
+
+      function applyLang(lang) {
+        var activeLang = supported.indexOf(lang) !== -1 ? lang : 'en';
+        sections.forEach(function (el) {
+          el.classList.toggle('active', el.getAttribute('data-lang') === activeLang);
         });
-        tabs.forEach(function (t) {
-          t.classList.toggle('active', t.getAttribute('data-lang') === lang);
-        });
-        try {
-          localStorage.setItem('xmrpay_lang', lang);
-        } catch (e) {}
       }
 
-      tabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-          setLang(tab.getAttribute('data-lang'));
-        });
+      applyLang(I18n.getLang());
+      I18n.onChange(function (lang) {
+        applyLang(lang);
       });
-
-      var initial = 'en';
-      try {
-        var saved = localStorage.getItem('xmrpay_lang');
-        if (saved && supported.indexOf(saved) !== -1) initial = saved;
-      } catch (e) {}
-      var nav = (navigator.language || 'en').slice(0, 2).toLowerCase();
-      if (supported.indexOf(nav) !== -1) initial = nav;
-      setLang(initial);
-    })();
+    });
   </script>
 </body>
 </html>

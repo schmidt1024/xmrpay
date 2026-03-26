@@ -459,6 +459,33 @@ textarea {
   margin-bottom: 0.3rem;
 }
 
+.shortlink-toggle-row {
+  margin-bottom: 0.45rem;
+}
+
+.shortlink-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.shortlink-toggle-label input {
+  width: auto;
+  accent-color: var(--accent);
+}
+
+.shortlink-tradeoff {
+  margin-top: 0.28rem;
+  font-size: 0.7rem;
+  color: #d08a61;
+  line-height: 1.35;
+}
+
 .share-link-row {
   display: flex;
   gap: 0.4rem;

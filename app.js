@@ -35,14 +35,17 @@
   const qrContainer = $('#qr');
   const uriBox = $('#uri');
   const openWalletBtn = $('#openWallet');
+  const copyUriBtn = $('#copyUri');
   const copyAddrBtn = $('#copyAddr');
   const countdownEl = $('#countdown');
   const fiatHint = $('#fiatHint');
   const toast = $('#toast');
   const shareLinkInput = $('#shareLink');
   const copyShareLinkBtn = $('#copyShareLink');
+  const useShortLinkCheckbox = $('#useShortLink');
   const newRequestBtn = $('#newRequest');
   const homeLink = $('#homeLink');
+  let currentInvoiceHash = null;
 
   // TX Proof DOM
   const proofToggle = $('#proofToggle');
@@ -119,8 +122,12 @@
   amountInput.addEventListener('input', updateFiatHint);
   currencySelect.addEventListener('change', updateFiatHint);
   generateBtn.addEventListener('click', generate);
+  copyUriBtn.addEventListener('click', () => copyToClipboard(uriBox.textContent));
   copyAddrBtn.addEventListener('click', () => copyToClipboard(addrInput.value.trim()));
   copyShareLinkBtn.addEventListener('click', () => copyToClipboard(shareLinkInput.value));
+  useShortLinkCheckbox.addEventListener('change', function () {
+    if (currentInvoiceHash) updateShareLink(currentInvoiceHash);
+  });
   qrContainer.addEventListener('click', downloadQR);
   newRequestBtn.addEventListener('click', resetForm);
   homeLink.addEventListener('click', function (e) { e.preventDefault(); resetForm(); });
@@ -179,6 +186,8 @@
     qrContainer.classList.remove('paid', 'confirming');
     uriBox.textContent = '';
     shareLinkInput.value = '';
+    useShortLinkCheckbox.checked = false;
+    currentInvoiceHash = null;
     // Reset proof
     invoiceCode = null;
     stopConfirmationPolling();
@@ -326,7 +335,7 @@
     buildSummary(xmrAmount, desc, timer);
     updatePageTitle(xmrAmount, desc);
 
-    // Share link — keep existing short URL if present; otherwise shorten new hash
+    // Share link
     var deadlineTs = null;
     if (timer && timer > 0) {
       if (!deadlineEndMs) {
@@ -335,14 +344,8 @@
       deadlineTs = Math.floor(deadlineEndMs / 1000);
     }
     const hash = buildHash(addr, xmrAmount, desc, timer, deadlineTs);
-    if (invoiceCode) {
-      shareLinkInput.value = location.origin + '/s/' + invoiceCode;
-    } else {
-      shareLinkInput.value = location.origin + '/#' + hash;
-      shortenUrl(hash).then(function (shortUrl) {
-        if (shortUrl) shareLinkInput.value = shortUrl;
-      });
-    }
+    currentInvoiceHash = hash;
+    updateShareLink(hash);
 
     // QR
     qrContainer.innerHTML = '';
@@ -410,6 +413,7 @@
     const code = params.get('c');
     if (code) {
       invoiceCode = code;
+      useShortLinkCheckbox.checked = true;
       // Verify short URL integrity (detect tampering)
       setTimeout(function () { 
         verifyShortUrlIntegrity(code, hash);
@@ -420,6 +424,26 @@
     // Auto-generate
     setTimeout(generate, 100);
     return true;
+  }
+
+  function updateShareLink(hash) {
+    var longUrl = location.origin + '/#' + hash;
+    shareLinkInput.value = longUrl;
+
+    if (!useShortLinkCheckbox.checked) {
+      return;
+    }
+
+    if (invoiceCode) {
+      shareLinkInput.value = location.origin + '/s/' + invoiceCode;
+      return;
+    }
+
+    shortenUrl(hash).then(function (shortUrl) {
+      if (shortUrl && useShortLinkCheckbox.checked && currentInvoiceHash === hash) {
+        shareLinkInput.value = shortUrl;
+      }
+    });
   }
 
   // Verify that the redirected hash still matches the stored short URL mapping.

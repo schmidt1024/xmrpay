@@ -67,6 +67,13 @@
       <div class="uri-box" id="uri" style="display:none"></div>
       <div class="share-link-box" id="shareLinkBox">
         <label data-i18n="label_share_link">Shareable link</label>
+        <div class="shortlink-toggle-row">
+          <label class="shortlink-toggle-label">
+            <input type="checkbox" id="useShortLink">
+            <span data-i18n="shortlink_toggle_label">Use short link (requires server trust)</span>
+          </label>
+          <div class="shortlink-tradeoff" data-i18n="shortlink_toggle_hint">Trade-off: short links are convenient, but a compromised server could swap invoice data on first access.</div>
+        </div>
         <div class="share-link-row">
           <input type="text" id="shareLink" readonly data-i18n-aria="label_share_link">
           <button class="btn btn-secondary btn-icon" id="copyShareLink" title="Copy">
@@ -76,6 +83,7 @@
       </div>
       <div class="actions">
         <button class="btn btn-secondary" id="openWallet" data-i18n="btn_open_wallet">Open in wallet</button>
+        <button class="btn btn-secondary" id="copyUri" data-i18n="btn_copy_uri">Copy payment URI</button>
         <button class="btn btn-secondary" id="copyAddr" data-i18n="btn_copy_addr">Copy address</button>
         <button class="btn btn-secondary" id="downloadPdf" data-i18n="btn_download_pdf">PDF Invoice</button>
       </div>

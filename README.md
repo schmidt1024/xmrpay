@@ -158,6 +158,20 @@ Use the provided deploy script to avoid deleting runtime files in `data/`:
 
 This script deploys with `rsync --delete` but explicitly excludes `data/`.
 
+Hardening built in:
+- Creates a remote pre-deploy backup archive of `data/`
+- Keeps the latest N backups (`DEPLOY_BACKUP_KEEP`, default `14`)
+- Supports dry runs (`DEPLOY_DRY_RUN=1`)
+- Configurable via `scripts/.deploy.env`
+
+Restore examples:
+
+```bash
+./scripts/restore-data.sh --list
+./scripts/restore-data.sh --latest
+./scripts/restore-data.sh --file data-YYYYMMDD-HHMMSS.tgz
+```
+
 ---
 
 ## Security

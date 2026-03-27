@@ -14,7 +14,7 @@ You need a VPS with a domain pointing to it. Then:
 curl -sL https://xmrpay.link/install.sh | sh -s your-domain.com
 ```
 
-Done. HTTPS is automatic (via Caddy + Let's Encrypt).
+Done. HTTPS is automatic (via Caddy + Let's Encrypt). A **Tor hidden service** (.onion) is included — the installer shows your onion address after setup.
 
 ### Requirements
 
@@ -66,6 +66,9 @@ XMRPAY_IMAGE=schmidt1024/xmrpay:latest
 EOF
 
 docker compose pull && docker compose up -d
+
+# Show your onion address
+docker exec xmrpay-tor cat /var/lib/tor/hidden_service/hostname
 ```
 
 ### Uninstall

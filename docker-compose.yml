@@ -12,6 +12,29 @@ services:
       - xmrpay-data:/srv/data
       - caddy-data:/data/caddy
 
+  tor:
+    image: alpine:latest
+    container_name: xmrpay-tor
+    restart: unless-stopped
+    depends_on:
+      - xmrpay
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        apk add --no-cache tor > /dev/null 2>&1
+        mkdir -p /var/lib/tor/hidden_service
+        chmod 700 /var/lib/tor/hidden_service
+        cat > /etc/tor/torrc <<EOF
+        SocksPort 0
+        HiddenServiceDir /var/lib/tor/hidden_service
+        HiddenServicePort 80 xmrpay:8080
+        EOF
+        echo "Starting Tor..."
+        tor -f /etc/tor/torrc
+    volumes:
+      - tor-keys:/var/lib/tor/hidden_service
+
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
@@ -25,3 +48,4 @@ services:
 volumes:
   xmrpay-data:
   caddy-data:
+  tor-keys:

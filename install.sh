@@ -52,7 +52,23 @@ docker compose up -d
 
 ok "xmrpay is running!"
 echo ""
-echo "  https://$DOMAIN"
+echo "  Clearnet:  https://$DOMAIN"
+
+# Wait for Tor to generate the onion address (up to 30s)
+info "Waiting for Tor hidden service..."
+ONION=""
+for i in $(seq 1 30); do
+  ONION=$(docker exec xmrpay-tor cat /var/lib/tor/hidden_service/hostname 2>/dev/null || true)
+  [ -n "$ONION" ] && break
+  sleep 1
+done
+if [ -n "$ONION" ]; then
+  ok "Tor hidden service ready"
+  echo "  Onion:     http://$ONION"
+else
+  echo "  Onion:     (still starting — run: docker exec xmrpay-tor cat /var/lib/tor/hidden_service/hostname)"
+fi
+
 echo ""
 echo "  Watchtower checks for updates every 6 hours."
 echo "  Data stored in Docker volume: xmrpay-data"

@@ -31,7 +31,7 @@ COPY Caddyfile /etc/caddy/Caddyfile
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 80 443
+EXPOSE 80 443 8080
 
 VOLUME ["/srv/data", "/data/caddy"]
 

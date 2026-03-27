@@ -1,10 +1,8 @@
-{$DOMAIN:localhost} {
+(common) {
 	root * /srv
 	encode gzip
 
-	# Security headers
 	header {
-		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "DENY"
 		Referrer-Policy "no-referrer"
@@ -12,13 +10,20 @@
 		Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'"
 	}
 
-	# Short URL rewrite: /s/CODE -> s.php?c=CODE
 	@shorturl path_regexp short ^/s/([a-zA-Z0-9]+)$
 	rewrite @shorturl /s.php?c={re.short.1}
 
-	# PHP via FPM
 	php_fastcgi 127.0.0.1:9000
-
-	# Static files
 	file_server
+}
+
+# Clearnet (auto-HTTPS)
+{$DOMAIN:localhost} {
+	import common
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+}
+
+# Tor hidden service (HTTP only, no TLS needed)
+:8080 {
+	import common
 }

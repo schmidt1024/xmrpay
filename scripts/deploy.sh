@@ -120,11 +120,12 @@ if [[ "$DRY_RUN" == "1" ]]; then
   echo "Running in dry-run mode (DEPLOY_DRY_RUN=1)."
 fi
 
-rsync -avz --delete \
+rsync -avz --delete --chmod=D755,F644 \
   ${RSYNC_DRY_RUN} \
   --exclude '.git' \
   --exclude 'node_modules' \
   --exclude 'data/' \
+  --exclude 'scripts/.deploy.env' \
   ./ "$HOST:$TARGET"
 
 echo "Deploy complete (data/ preserved)."

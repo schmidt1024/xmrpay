@@ -215,7 +215,7 @@
     paymentStatus.innerHTML = '';
     paymentStatus.className = 'payment-status';
     paymentSummary.innerHTML = '';
-    document.title = 'xmrpay.link \u2014 Monero Invoice Generator';
+    document.title = 'xmrpay \u2014 Monero Invoice Generator';
     history.replaceState(null, '', location.pathname);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     addrInput.focus();
@@ -517,7 +517,7 @@
     if (xmrAmount) parts.push(xmrAmount.toFixed(4) + ' XMR');
     if (desc) parts.push(desc);
     if (parts.length) {
-      document.title = parts.join(' — ') + ' | xmrpay.link';
+      document.title = parts.join(' — ') + ' | xmrpay';
     }
   }
 

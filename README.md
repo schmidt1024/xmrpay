@@ -97,7 +97,7 @@ The public instance at [xmrpay.link](https://xmrpay.link) exists as a demo and f
 - **Payment verification** — sender provides TX Hash + TX Key, cryptographic verification in browser
 - **Fiat conversion** — EUR/USD/CHF/GBP/JPY/RUB/BRL via CoinGecko, auto-detected from locale
 - **Short URLs** — optional, with explicit trust trade-off warning
-- **i18n** — English, German, French, Italian, Spanish, Portuguese, Russian
+- **i18n** — English, German, French, Italian, Spanish, Portuguese, Russian, Turkish
 - **Offline-capable** — Service Worker for offline use
 - **Privacy** — zero cookies, no analytics, no external scripts, self-hosted fonts
 

@@ -145,7 +145,7 @@ xmrpay.link/
 ## Self-Hosting
 
 ```bash
-git clone https://gitea.schmidt.eco/schmidt1024/xmrpay.link.git
+git clone https://github.com/schmidt1024/xmrpay.git
 cd xmrpay.link
 # Serve with any web server that supports PHP
 # No build tools, no npm, no database required

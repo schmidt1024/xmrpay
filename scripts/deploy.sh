@@ -68,6 +68,15 @@ else
   echo "Skipping pre-deploy backup (DEPLOY_BACKUP_ENABLE=0)."
 fi
 
+# ── Inject version from git tags ──────────────────────────────────────────────
+GIT_VERSION=$(git describe --tags --always 2>/dev/null || echo "dev")
+# Turn v1.0.0-3-gabc1234 into 1.0.0+3
+VERSION=$(echo "$GIT_VERSION" | sed -E 's/^v//; s/-([0-9]+)-g[0-9a-f]+$/+\1/')
+echo "Version: $VERSION"
+
+sed -i -E "s|VERSION = '[^']*'|VERSION = '${VERSION}'|" i18n.js
+sed -i -E "s|(<span class=\"version\">v)[^<]*(</span>)|\1${VERSION}\2|" index.html
+
 # ── Minify & update SRI hashes ────────────────────────────────────────────────
 echo "Minifying JS..."
 TERSER="${TERSER:-terser}"

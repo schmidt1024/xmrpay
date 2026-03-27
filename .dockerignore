@@ -1,0 +1,12 @@
+.git
+data/
+scripts/
+branding/
+README.md
+LICENSE
+nginx-security-headers.conf
+docker-compose.yml
+.dockerignore
+.gitignore
+app.js
+i18n.js

@@ -1,0 +1,96 @@
+name: Build & Push Docker Image
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  IMAGE_NAME: xmrpay
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Inject version into source
+        run: |
+          sed -i "s|VERSION = '[^']*'|VERSION = '${{ steps.version.outputs.version }}'|" i18n.js
+          sed -i -E "s|(<span class=\"version\">v)[^<]*(</span>)|\1${{ steps.version.outputs.version }}\2|" index.html
+
+      - name: Minify JS
+        run: |
+          npm i -g terser
+          terser app.js  -c -m -o app.min.js
+          terser i18n.js -c -m -o i18n.min.js
+
+      - name: Update SRI hashes
+        run: |
+          sri() { echo "sha384-$(openssl dgst -sha384 -binary "$1" | openssl base64 -A)"; }
+
+          H_STYLE=$(sri style.css)
+          H_QRCODE=$(sri lib/qrcode.min.js)
+          H_I18N=$(sri i18n.min.js)
+          H_JSPDF=$(sri lib/jspdf.min.js)
+          H_CRYPTO=$(sri lib/xmr-crypto.bundle.js)
+
+          # Update dynamic SRI in app.js and re-minify
+          sed -i -E \
+            -e "s|(jspdf\.min\.js.*integrity\s*=\s*')sha384-[A-Za-z0-9+/=]+|\1${H_JSPDF}|" \
+            -e "s|(xmr-crypto\.bundle\.js.*integrity\s*=\s*')sha384-[A-Za-z0-9+/=]+|\1${H_CRYPTO}|" \
+            app.js
+          terser app.js -c -m -o app.min.js
+          H_APP=$(sri app.min.js)
+
+          # Update index.html
+          sed -i -E \
+            -e "s|(style\.css[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${H_STYLE}|" \
+            -e "s|(qrcode\.min\.js[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${H_QRCODE}|" \
+            -e "s|(i18n\.min\.js[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${H_I18N}|" \
+            -e "s|(app\.min\.js[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${H_APP}|" \
+            index.html
+
+          # Update privacy.html
+          sed -i -E \
+            -e "s|(style\.css[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${H_STYLE}|" \
+            privacy.html
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            schmidt1024/${{ env.IMAGE_NAME }}:latest
+            schmidt1024/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

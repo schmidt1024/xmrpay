@@ -1,0 +1,27 @@
+services:
+  xmrpay:
+    image: ${XMRPAY_IMAGE:-schmidt1024/xmrpay:latest}
+    container_name: xmrpay
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+    volumes:
+      - xmrpay-data:/srv/data
+      - caddy-data:/data/caddy
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=21600
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  xmrpay-data:
+  caddy-data:

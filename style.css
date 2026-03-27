@@ -66,6 +66,7 @@ body {
   font-size: 0.85rem;
   line-height: 1.4;
   position: relative;
+  z-index: 60;
 }
 
 .self-host-banner a {

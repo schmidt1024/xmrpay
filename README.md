@@ -1,89 +1,111 @@
-# xmrpay.link — Monero Invoice Generator
+# xmrpay — Monero Invoice Generator
 
-> Private. Self-hosted. No accounts. No tracking. No bullshit.
+> Create Monero payment requests in seconds. No accounts. No tracking. No KYC.
 
-**[Live: xmrpay.link](https://xmrpay.link)** · **[Tor: mc6wfe...zyd.onion](http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion)**
-
----
-
-## What is this?
-
-**xmrpay.link** is a client-side web app that lets anyone create a professional Monero payment request in under 30 seconds — no account registration, no KYC, no custodial services.
-
-Enter your address, the amount, an optional description — and get a wallet-native `monero:` URI, QR code, and PDF invoice. Short links are optional.
-
-### Architecture & Transparency
-
-xmrpay.link uses a **minimal backend** for the following specific purposes:
-
-| Component | Where it runs | What the server sees |
-|-----------|--------------|---------------------|
-| QR code generation | Browser only | Nothing |
-| PDF invoice | Browser only | Nothing |
-| Payment (TX) verification | Browser only | Nothing |
-| Fiat exchange rates | Server (CoinGecko proxy) | Your IP address |
-| Short URL storage | Server | Invoice hash (address + amount + description), HMAC-signed |
-| Payment proof storage | Server | TX hash + amount — **not** your XMR address |
-
-**Self-hosting** eliminates trust in the public instance.  
-**No short links** (use wallet URI / long `/#...` URL / QR code) = no shortlink lookup dependency.
-
-### Trust Model (Important)
-
-- **Default mode:** wallet-native URI + QR (no shortlink lookup).
-- **Short links are opt-in:** convenience feature with a trust trade-off.
-- **Public instance caution:** if a server is fully compromised, first-access shortlink resolution can be manipulated.
-- **Best security posture:** use wallet URI directly or self-host.
-
-### Security Model
-
-- **HMAC-signed short URLs:** Hashes are signed with a server-side secret. Clients verify the signature on load to detect tampering.
-- **Address never stored:** Payment verification is cryptographic and runs client-side. The server never learns your XMR address.
-- **Rate-limited APIs:** All write endpoints are rate-limited per IP.
-- **Origin-restricted:** API endpoints reject cross-origin requests.
-- **Clear scope:** HMAC improves integrity checks, but it is not a complete defense against a fully compromised server.
+**[Demo: xmrpay.link](https://xmrpay.link)** — for real payments, self-host your own instance.
 
 ---
 
-## Why?
+## Self-Host in 60 Seconds
 
-| Solution | Problem |
+You need a VPS with a domain pointing to it. Then:
+
+```bash
+curl -sL https://xmrpay.link/install.sh | sh -s your-domain.com
+```
+
+Done. HTTPS is automatic (via Caddy + Let's Encrypt).
+
+### Requirements
+
+| | Minimum | Recommended |
+|---|---|---|
+| **CPU** | 1 vCPU | 2 vCPU |
+| **RAM** | 1 GB | 2 GB |
+| **Disk** | 10 GB | 20 GB |
+| **OS** | Any Linux with Docker | Ubuntu 22+, Debian 12+ |
+| **Domain** | A-Record pointing to server IP | |
+| **Cost** | ~3 EUR/month (Hetzner, Contabo, etc.) | |
+
+### Updates
+
+Watchtower runs alongside xmrpay and automatically pulls new images every 6 hours. No action needed.
+
+Manual update:
+
+```bash
+cd /opt/xmrpay && docker compose pull && docker compose up -d
+```
+
+### Configuration
+
+After install, the config is at `/opt/xmrpay/.env`:
+
+```bash
+DOMAIN=your-domain.com
+XMRPAY_IMAGE=schmidt1024/xmrpay:latest
+```
+
+### Docker Images
+
+| Registry | Pull command |
 |---|---|
-| **BTCPay Server** | Requires own server, complex setup |
-| **NOWPayments, Globee** | Custodial, KYC, fees, third-party dependency |
-| **Cake Wallet Invoice** | Mobile-only, no sharing without app |
-| **MoneroPay** | Backend daemon required, developer-only |
-| **Wallet QR** | No amount, no description, no confirmation |
+| Docker Hub | `docker pull schmidt1024/xmrpay:latest` |
+| GitHub (GHCR) | `docker pull ghcr.io/schmidt1024/xmrpay:latest` |
 
-**The gap:** There's no simple, privacy-respecting tool for freelancers, small merchants, and creators that works without setup and still allows payment confirmation.
+### Manual Setup (without install script)
+
+```bash
+mkdir -p /opt/xmrpay && cd /opt/xmrpay
+
+curl -fsSL https://raw.githubusercontent.com/schmidt1024/xmrpay/master/docker-compose.yml -o docker-compose.yml
+
+cat > .env <<EOF
+DOMAIN=your-domain.com
+XMRPAY_IMAGE=schmidt1024/xmrpay:latest
+EOF
+
+docker compose pull && docker compose up -d
+```
+
+### Uninstall
+
+```bash
+cd /opt/xmrpay && docker compose down -v
+```
+
+---
+
+## Why Self-Host?
+
+**Any server you don't control can steal your funds.** The JavaScript loaded from a third-party instance can swap the address in the QR code or exfiltrate payment data. No HMAC, no SRI hash, no URL fragment can fully prevent this — because the server controls the code your browser runs.
+
+Self-hosting eliminates this risk. You control the server, you control the code.
+
+The public instance at [xmrpay.link](https://xmrpay.link) exists as a demo and for testing only.
 
 ---
 
 ## Features
 
-### Invoice Generation
-- XMR address input with validation (standard, subaddress, integrated)
-- Amount in XMR or fiat (EUR/USD/CHF/GBP/JPY/RUB/BRL via CoinGecko, auto-detected)
-- Description and payment deadline (7/14/30 days or custom)
-- Wallet-native `monero:` URI with copy action
-- QR code for the same wallet-native URI
-- Optional short URL toggle (`/s/abc123`) with explicit trust trade-off hint
-- PDF invoice download (with QR, amount, fiat equivalent, deadline)
-- i18n (EN, DE, FR, IT, ES, PT, RU) with automatic browser detection
+- **Invoice generation** — XMR address, amount (XMR or fiat), description, payment deadline
+- **Wallet-native URI** — `monero:` URI with QR code, works with any Monero wallet
+- **PDF invoice** — downloadable with QR, amount, fiat equivalent, deadline
+- **Payment verification** — sender provides TX Hash + TX Key, cryptographic verification in browser
+- **Fiat conversion** — EUR/USD/CHF/GBP/JPY/RUB/BRL via CoinGecko, auto-detected from locale
+- **Short URLs** — optional, with explicit trust trade-off warning
+- **i18n** — English, German, French, Italian, Spanish, Portuguese, Russian
+- **Offline-capable** — Service Worker for offline use
+- **Privacy** — zero cookies, no analytics, no external scripts, self-hosted fonts
 
-### Payment Verification (TX Proof)
-- Sender provides TX Hash + TX Key from their wallet
-- Cryptographic verification in the browser (no private keys needed)
-- Payment status stored with the invoice (server stores proof, but not your address)
-- Invoice link shows "Paid" badge after verification
-- Standard and subaddress support
+### Security
 
-### Performance & Privacy
-- 100% Lighthouse score (Performance, Accessibility, Best Practices, SEO)
-- Offline-capable via Service Worker
-- Self-hosted fonts (no Google Fonts dependency)
-- Zero external tracking, no cookies
-- Dark mode, responsive design
+- **CSP** — Content Security Policy blocks exfiltration to foreign domains
+- **SRI** — Subresource Integrity on all scripts, verified on every load
+- **HMAC-signed short URLs** — detect server-side tampering
+- **Rate-limited APIs** — all write endpoints rate-limited per IP
+- **No private keys** — TX proof uses the sender's TX key, not the receiver's view key
+- **Client-side crypto** — Ed25519 + Keccak-256 verification runs in browser
 
 ---
 
@@ -94,111 +116,23 @@ Frontend:    HTML + Vanilla JS (no frameworks, no build step)
 Crypto:      @noble/curves Ed25519 + Keccak-256 (30KB bundle)
 QR:          QRCode.js (client-side)
 PDF:         jsPDF (client-side, lazy-loaded)
-Hosting:     Static site + minimal PHP for short URLs and RPC proxy
 Backend:     Minimal PHP (URL shortener, rates proxy, proof storage)
-Data:        JSON files (no database), LocalStorage (client-side)
+Data:        JSON files (no database)
+Hosting:     Caddy (auto-HTTPS) + PHP-FPM in Alpine Docker
 ```
 
 ---
 
-## Project Structure
-
-```
-xmrpay.link/
-├── index.html              # Single-page app
-├── app.js / app.min.js     # Main logic (URI builder, QR, fiat rates, TX proof)
-├── i18n.js / i18n.min.js   # Internationalization (DE, EN)
-├── style.css               # Dark theme, responsive, WCAG AA
-├── sw.js                   # Service Worker (offline support)
-├── favicon.svg             # Monero coin logo
-├── s.php                   # Short URL redirect
-├── api/
-│   ├── shorten.php         # Short URL creation
-│   ├── rates.php           # CoinGecko proxy with server-side cache
-│   ├── node.php            # Monero RPC proxy (4-node failover)
-│   └── verify.php          # TX proof storage/retrieval
-├── data/                   # JSON storage (auto-generated)
-├── fonts/                  # Self-hosted Inter + JetBrains Mono
-├── lib/
-│   ├── qrcode.min.js       # QR code generator
-│   ├── jspdf.min.js        # PDF generation (lazy-loaded)
-│   └── xmr-crypto.bundle.js # Ed25519 + Keccak-256 (lazy-loaded)
-├── README.md
-└── LICENSE                 # MIT
-```
-
----
-
-## Invoice Lifecycle
-
-**Optional Deadline:** When creating an invoice, you can set an expiration deadline (7/14/30 days or custom). 
-
-**Lazy Cleanup:** When a deadline is enabled, the short URL and payment proof are automatically deleted if accessed after expiration:
-- Accessing an expired short URL returns **HTTP 410 Gone** and removes the entry
-- Retrieving a proof for an expired invoice returns `verified: false` and cleans up the entry
-- No background jobs or cron tasks required
-
-**No deadline?** Invoices without a deadline persist indefinitely (no auto-cleanup).
-
----
-
-## Self-Hosting
+## Development
 
 ```bash
 git clone https://github.com/schmidt1024/xmrpay.git
-cd xmrpay.link
-# Serve with any web server that supports PHP
-# No build tools, no npm, no database required
-python3 -m http.server 8080  # For development (no PHP features)
+cd xmrpay
+
+# Local Docker build
+docker build -t xmrpay:dev .
+docker run -p 8080:80 -e DOMAIN=localhost xmrpay:dev
 ```
-
-Requirements for full functionality:
-- PHP 8.x with `curl` extension
-- Nginx or Apache (for `/s/` short URL rewrites)
-- Writable `data/` directory
-
-### Production Deploy (Safe)
-
-Use the provided deploy script to avoid deleting runtime files in `data/`:
-
-```bash
-./scripts/deploy.sh
-```
-
-This script deploys with `rsync --delete` but explicitly excludes `data/`.
-
-Hardening built in:
-- Creates a remote pre-deploy backup archive of `data/`
-- Keeps the latest N backups (`DEPLOY_BACKUP_KEEP`, default `14`)
-- Supports dry runs (`DEPLOY_DRY_RUN=1`)
-- Configurable via `scripts/.deploy.env`
-
-Restore examples:
-
-```bash
-./scripts/restore-data.sh --list
-./scripts/restore-data.sh --latest
-./scripts/restore-data.sh --file data-YYYYMMDD-HHMMSS.tgz
-```
-
----
-
-## Security
-
-- **No private keys** — TX proof uses the sender's TX key, not the receiver's view key
-- **Client-side crypto** — Ed25519 verification runs in the browser
-- **No tracking** — zero cookies, no analytics, no external scripts
-- **RPC proxy** — allowlisted methods only, rate-limited
-- **Self-hostable** — run your own instance for full control
-
----
-
-## Roadmap
-
-- [ ] Embeddable `<iframe>` payment widget
-- [ ] Invoice history (LocalStorage, CSV export)
-- [ ] "Pay Button" generator (HTML snippet)
-- [x] Auto-cleanup: Lazy-delete invoices after deadline expires
 
 ---
 

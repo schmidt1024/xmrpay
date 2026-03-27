@@ -58,6 +58,40 @@ body {
   align-items: center;
 }
 
+.self-host-banner {
+  background: var(--accent);
+  color: #fff;
+  text-align: center;
+  padding: 0.6rem 2.5rem 0.6rem 1rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  position: relative;
+}
+
+.self-host-banner a {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.self-host-banner button {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 0.25rem 0.5rem;
+}
+
+.self-host-banner button:hover {
+  opacity: 1;
+}
+
 header {
   text-align: center;
   padding: 2rem 1rem 1rem;

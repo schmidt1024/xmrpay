@@ -12,6 +12,11 @@
 </head>
 <body>
 
+  <div class="self-host-banner" id="selfHostBanner" hidden>
+    <span data-i18n-html="self_host_banner">This is a public demo. For real payments, <a href="https://github.com/schmidt1024/xmrpay#self-host-in-60-seconds">host your own instance</a> — it takes 60 seconds.</span>
+    <button id="dismissBanner" aria-label="Dismiss">&times;</button>
+  </div>
+
   <header>
     <h1><a href="/" id="homeLink">xmr<span>pay</span>.link</a></h1>
     <p data-i18n="subtitle">Monero payment request in seconds</p>
@@ -132,7 +137,7 @@
   <div class="toast" id="toast"></div>
 
   <script src="lib/qrcode.min.js?v=20260326-3" integrity="sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU" crossorigin="anonymous" defer></script>
-  <script src="i18n.min.js?v=20260326-3" integrity="sha384-V43P6Gk3Zsd0cmqIx3V1Dffu0i3d3aFyb876gr5ez+1CIAzbFLFATfL1nuEZFzvC" crossorigin="anonymous" defer></script>
+  <script src="i18n.min.js?v=20260326-3" integrity="sha384-mKqQalrpTWCzSD1ErLtp+GqHpzJDm7D1jzHDMuhCW7ql2v9YkEzSfE4PNuTj4dqU" crossorigin="anonymous" defer></script>
   <script src="app.min.js?v=20260326-3" integrity="sha384-tdgiaUZYJ6E+/EqlbzOvxRvySKQZNdxjNktRV3K75fitMLdkR5DXuVU9XTppNku5" crossorigin="anonymous" defer></script>
 </body>
 </html>

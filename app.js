@@ -61,6 +61,21 @@
   let pdfLoaded = false;
   let lastPaidData = null;
 
+  // --- Self-host Banner ---
+  (function () {
+    var PUBLIC_HOSTS = ['xmrpay.link', 'mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion'];
+    var banner = $('#selfHostBanner');
+    var dismiss = $('#dismissBanner');
+    if (!banner) return;
+    if (PUBLIC_HOSTS.indexOf(location.hostname) === -1) return;
+    if (sessionStorage.getItem('banner_dismissed')) return;
+    banner.hidden = false;
+    dismiss.addEventListener('click', function () {
+      banner.hidden = true;
+      sessionStorage.setItem('banner_dismissed', '1');
+    });
+  })();
+
   // --- Currency Detection ---
   function detectCurrency() {
     var localeToCurrency = {

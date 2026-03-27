@@ -7,7 +7,7 @@ set -e
 DOMAIN="${1:-}"
 INSTALL_DIR="/opt/xmrpay"
 IMAGE="schmidt1024/xmrpay:latest"
-COMPOSE_URL="https://raw.githubusercontent.com/schmidt1024/xmrpay.link/master/docker-compose.yml"
+COMPOSE_URL="https://raw.githubusercontent.com/schmidt1024/xmrpay/master/docker-compose.yml"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 

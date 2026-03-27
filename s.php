@@ -1,5 +1,5 @@
 <?php
-$pathInfo = isset($_SERVER['PATH_INFO']) && is_string($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : null;
+$pathInfo = isset($_SERVER['PATH_INFO']) && is_string($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] !== '' ? $_SERVER['PATH_INFO'] : null;
 $queryCode = isset($_GET['c']) && is_string($_GET['c']) ? $_GET['c'] : '';
 $code = trim($pathInfo ?? $queryCode, '/');
 

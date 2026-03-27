@@ -11,7 +11,9 @@ var I18n = (function () {
     ru: { name: 'Русский' }
   };
 
-  var footer = 'Open Source &middot; No Tracking &middot; No KYC<br /><a href="https://gitea.schmidt.eco/schmidt1024/xmrpay.link" target="_blank" rel="noopener noreferrer">Source</a> &middot; <a href="http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion" title="Tor Hidden Service">Onion</a> &middot; <a href="/privacy.html">Privacy &amp; Terms</a>';
+  var VERSION = '1.0.0';
+
+  var footer = 'Open Source &middot; No Tracking &middot; No KYC<br /><a href="https://gitea.schmidt.eco/schmidt1024/xmrpay.link" target="_blank" rel="noopener noreferrer">Source</a> &middot; <a href="http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion" title="Tor Hidden Service">Onion</a> &middot; <a href="/privacy.html">Privacy &amp; Terms</a><br /><span class="version">v' + VERSION + '</span>';
 
   var translations = {
     en: {

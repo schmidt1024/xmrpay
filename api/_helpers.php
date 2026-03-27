@@ -14,13 +14,19 @@ function send_security_headers(): void {
 
 // ── Origin verification ───────────────────────────────────────────────────────
 function verify_origin(): void {
-    $allowed = [
-        'https://xmrpay.link',
-        'http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion',
-    ];
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
     // Allow same-origin (no Origin header from direct same-origin requests)
     if ($origin === '') return;
+
+    // Dynamically allow the host this instance runs on
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $self_origin = $scheme . '://' . ($_SERVER['HTTP_HOST'] ?? '');
+
+    $allowed = [
+        $self_origin,
+        'https://xmrpay.link',
+        'http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion',
+    ];
     if (!in_array($origin, $allowed, true)) {
         http_response_code(403);
         echo json_encode(['error' => 'Origin not allowed']);

@@ -192,6 +192,25 @@
           <li>Dostupnost ne garantiruetsya; funktsii mogut izmenyatsya v lyuboe vremya.</li>
         </ul>
       </section>
+      
+      <section class="legal-lang" data-lang="tr">
+        <h2>Türkçe</h2>
+        <h3>Mahremiyet Politikası</h3>
+        <p>xmrpay.link veri toplama işlemini asgari seviyeye indirecek şekilde tasarlanmıştır. Hesap oluşturmaya gerek yoktur.</p>
+        <ul>
+          <li><strong>Hız sınırlaması:</strong> kötüye kullanım karşıtı koruma mekanizması, IP'lerden gelen istekleri kısa süreli dosyalarda tutar. İlgili IP adresleri ham hali ile değil, hash'lenmiş olarak barındırılır.</li>
+          <li><strong>Kısaltılmış bağlantılar:</strong> fatura hash verileri, oluşturulan kısa URL'ler için saklanır.</li>
+          <li><strong>Ödeme onayı:</strong> eğer kullanıldılar ise; tx hash değeri, tutar, onaylamalar ve zaman mührü saklanır. Onay veritabanında hiçbir Monero adresi saklanmaz.</li>
+          <li><strong>Hiçbir şey takip edilmez:</strong> istatistik ve reklam olmadığı gibi herhangi bir profilleme eylemi barındırmaz.</li>
+        </ul>
+        <h3>Kullanım Koşulları</h3>
+        <ul>
+          <li>Tüm servis "olduğu gibi" herhangi bir garanti olmadan sunulmaktadır.</li>
+          <li>Tâbi olduğunuz yasalara uyum hususunda tüm sorumluluk size aittir.</li>
+          <li>Servisin herhangi bir nedenle istismarı, yasadışı alanda kullanımı ve/veya servise yönelik saldırılar yasaklı eylem statüsündedir.</li>
+          <li>İlgili kullanılabilirlik garanti edilmemiştir, tüm özellikler herhangi bir zaman aralığında değişebilir.</li>
+        </ul>
+      </section>
 
       <p style="margin-top:1rem;color:var(--text-muted);font-size:0.82rem;">Last updated: 2026-03-26</p>
     </div>
@@ -215,7 +234,7 @@
   <script src="i18n.min.js?v=20260326-3" integrity="sha384-FfBaeFwBMGnIIOFgRYMxAcFLdp1MMUAc4V8YIg+jLInG8yWQdpMA05eicLc+QFaC" crossorigin="anonymous" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      var supported = ['en', 'de', 'fr', 'it', 'es', 'pt', 'ru'];
+      var supported = ['en', 'de', 'fr', 'it', 'es', 'pt', 'ru', 'tr'];
       var sections = document.querySelectorAll('.legal-lang');
 
       function applyLang(lang) {

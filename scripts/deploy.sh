@@ -68,6 +68,52 @@ else
   echo "Skipping pre-deploy backup (DEPLOY_BACKUP_ENABLE=0)."
 fi
 
+# ── Minify & update SRI hashes ────────────────────────────────────────────────
+echo "Minifying JS..."
+TERSER="${TERSER:-terser}"
+if ! command -v "$TERSER" &>/dev/null; then
+  echo "Error: terser not found. Install with: npm i -g terser" >&2
+  exit 1
+fi
+"$TERSER" app.js  -c -m -o app.min.js
+"$TERSER" i18n.js -c -m -o i18n.min.js
+
+echo "Updating SRI hashes..."
+sri_hash() { echo "sha384-$(openssl dgst -sha384 -binary "$1" | openssl base64 -A)"; }
+
+HASH_STYLE=$(sri_hash style.css)
+HASH_QRCODE=$(sri_hash lib/qrcode.min.js)
+HASH_I18N=$(sri_hash i18n.min.js)
+HASH_APP=$(sri_hash app.min.js)
+HASH_JSPDF=$(sri_hash lib/jspdf.min.js)
+HASH_CRYPTO=$(sri_hash lib/xmr-crypto.bundle.js)
+
+# Update index.html SRI attributes
+sed -i -E \
+  -e "s|(style\.css[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${HASH_STYLE}|" \
+  -e "s|(qrcode\.min\.js[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${HASH_QRCODE}|" \
+  -e "s|(i18n\.min\.js[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${HASH_I18N}|" \
+  -e "s|(app\.min\.js[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${HASH_APP}|" \
+  index.html
+
+# Update privacy.html SRI attributes
+sed -i -E \
+  -e "s|(style\.css[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${HASH_STYLE}|" \
+  privacy.html
+
+# Update dynamic SRI hashes in app.js and re-minify if changed
+sed -i -E \
+  -e "s|(jspdf\.min\.js.*integrity\s*=\s*')sha384-[A-Za-z0-9+/=]+|\1${HASH_JSPDF}|" \
+  -e "s|(xmr-crypto\.bundle\.js.*integrity\s*=\s*')sha384-[A-Za-z0-9+/=]+|\1${HASH_CRYPTO}|" \
+  app.js
+
+# Re-minify app.js (dynamic SRI hashes may have changed)
+"$TERSER" app.js -c -m -o app.min.js
+HASH_APP_FINAL=$(sri_hash app.min.js)
+sed -i -E "s|(app\.min\.js[^\"]*\"\s+integrity=\")sha384-[A-Za-z0-9+/=]+|\1${HASH_APP_FINAL}|" index.html
+
+echo "SRI hashes updated."
+
 RSYNC_DRY_RUN=""
 if [[ "$DRY_RUN" == "1" ]]; then
   RSYNC_DRY_RUN="--dry-run"

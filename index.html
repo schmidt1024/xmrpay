@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>xmrpay.link — Monero Invoice Generator</title>
   <meta name="description" content="Create Monero payment requests in seconds. No account registration, no KYC. Minimal backend for short URLs only.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; form-action 'none'; base-uri 'none'">
   <link rel="icon" id="favicon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css?v=20260326-3">
+  <link rel="stylesheet" href="style.css?v=20260326-3" integrity="sha384-ntklmpjtBHVfhFRH4pdoZb86mpDOt3aBw7s2XFpvGgT8vrelMuw6H4EnPultQEXT" crossorigin="anonymous">
 </head>
 <body>
 
@@ -114,7 +115,7 @@
   </main>
 
   <footer>
-    <p data-i18n-html="footer">Open Source &middot; No Tracking &middot; No KYC &middot; <a href="https://gitea.schmidt.eco/schmidt1024/xmrpay.link" target="_blank" rel="noopener noreferrer">Source</a> &middot; <a href="http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion" title="Tor Hidden Service">Onion</a> &middot; <a href="/privacy.html">Privacy &amp; Terms</a></p>
+    <p data-i18n-html="footer">Open Source &middot; No Tracking &middot; No KYC<br /><a href="https://gitea.schmidt.eco/schmidt1024/xmrpay.link" target="_blank" rel="noopener noreferrer">Source</a> &middot; <a href="http://mc6wfeaqc7oijgdcudrr5zsotmwok3jzk3tu2uezzyjisn7nzzjjizyd.onion" title="Tor Hidden Service">Onion</a> &middot; <a href="/privacy.html">Privacy &amp; Terms</a></p>
   </footer>
 
   <div class="lang-picker" id="langPicker">
@@ -130,8 +131,8 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="lib/qrcode.min.js?v=20260326-3" defer></script>
-  <script src="i18n.min.js?v=20260326-3" defer></script>
-  <script src="app.min.js?v=20260326-3" defer></script>
+  <script src="lib/qrcode.min.js?v=20260326-3" integrity="sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU" crossorigin="anonymous" defer></script>
+  <script src="i18n.min.js?v=20260326-3" integrity="sha384-DOaPisq9d2LQogorLYKjAclE021CXio6vwhHo/hpBNtc3LaITnVtkxqNT2FVrunW" crossorigin="anonymous" defer></script>
+  <script src="app.min.js?v=20260326-3" integrity="sha384-tdgiaUZYJ6E+/EqlbzOvxRvySKQZNdxjNktRV3K75fitMLdkR5DXuVU9XTppNku5" crossorigin="anonymous" defer></script>
 </body>
 </html>

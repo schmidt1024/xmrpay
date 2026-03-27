@@ -614,6 +614,8 @@
       if (window.jspdf) { resolve(); return; }
       var script = document.createElement('script');
       script.src = 'lib/jspdf.min.js';
+      script.integrity = 'sha384-GwHhSt8QjC7J+v0zZ0Flfho/T76YHEcCL9w4rvjTIUHauh6gWJeBSIi3vWXxNhtA';
+      script.crossOrigin = 'anonymous';
       script.onload = function () { pdfLoaded = true; resolve(); };
       script.onerror = function () { reject(new Error('Failed to load jsPDF')); };
       document.head.appendChild(script);
@@ -820,6 +822,8 @@
       if (window.XmrCrypto) { resolve(); return; }
       const script = document.createElement('script');
       script.src = 'lib/xmr-crypto.bundle.js';
+      script.integrity = 'sha384-ta9IpDZOod8WcA7TprKyb/TxmOSNfkG0fCjhWssiSmpft9MLXAtSO8L8YmnH3DCY';
+      script.crossOrigin = 'anonymous';
       script.onload = resolve;
       script.onerror = function () { reject(new Error('Failed to load crypto module')); };
       document.head.appendChild(script);

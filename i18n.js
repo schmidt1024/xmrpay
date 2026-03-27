@@ -8,7 +8,8 @@ var I18n = (function () {
     it: { name: 'Italiano' },
     es: { name: 'Español' },
     pt: { name: 'Português' },
-    ru: { name: 'Русский' }
+    ru: { name: 'Русский' },
+    tr: { name: 'Türkçe' }
   };
 
   var VERSION = '1.1.1';
@@ -386,6 +387,58 @@ var I18n = (function () {
       status_pending: 'Ожидание',
       proof_confirmed_pending: 'Выход найден: {amount} XMR — {n}/10 подтверждений. Авт. обновление…',
       toast_integrity_warning: 'Предупреждение: обнаружено несоответствие подписи'
+    },
+    tr: {
+      subtitle: 'Saniyeler içerisinde Monero ödeme talebi',
+      label_addr: 'XMR Adresi',
+      placeholder_addr: '8...',
+      label_amount: 'Tutar',
+      label_desc: 'Açıklama (isteğe bağlı)',
+      placeholder_desc: 'örn. 42 numaralı Fatura, freelance iş için...',
+      label_timer: 'Ödeme için son tarih (isteğe bağlı)',
+      days: 'gün',
+      placeholder_timer_custom: 'Gün',
+      btn_generate: 'Ödeme talebi oluştur',
+      btn_open_wallet: 'Cüzdanda aç',
+      btn_copy_uri: 'URI kopyala',
+      btn_copy_addr: 'Adresi kopyala',
+      btn_download_pdf: 'Fatura (PDF)',
+      pdf_title: 'Ödeme Talebi',
+      pdf_address: 'XMR Adresi',
+      pdf_amount: 'Tutar',
+      pdf_desc: 'Açıklama',
+      pdf_deadline: 'Ödeme için son tarih',
+      pdf_deadline_days: '{d} gün',
+      pdf_date: 'Tarih',
+      pdf_scan_qr: 'Ödeme için QR kodu tara',
+      pdf_footer: 'xmrpay.link ile oluşturulmuştur',
+      qr_hint: 'QR kodu kaydetmek için tıkla',
+      footer: footer,
+      aria_currency: 'Para Birimi',
+      label_share_link: 'Paylaşılabilir bağlantı',
+      shortlink_toggle_label: 'Kısaltılmış bağlantı kullan (sunucuya güven gerektirir)',
+      shortlink_toggle_hint: 'Olası dezavantaj: kısaltılmış bağlantılar kullanışlıdır, fakat ilgili sunucu güvende değil ise ilk erişimde fatura verileri değiştirilebilir.',
+      btn_new_request: 'Yeni ödeme talebi',
+      toast_copied: 'Kopyalandı!',
+      countdown_expired: 'Ödeme için son tarih süresi doldu',
+      countdown_remaining_days: 'Son Tarih: {d} gün, {h} saat',
+      countdown_remaining_hours: 'Son Tarih: {h}:{m}',
+      rates_offline: 'Birim uygun değil — Yalnızca XMR tutarı',
+      btn_prove_payment: 'Ödemeyi doğrula',
+      label_tx_hash: 'İşlem anahtarı (TX Hash)',
+      placeholder_tx_hash: '64 hex karakteri...',
+      label_tx_key: 'İşlem Anahtarı (TX Key)',
+      placeholder_tx_key: '64 hex karakteri...',
+      btn_verify_proof: 'Ödemeyi onayla',
+      proof_verifying: 'Onaylanıyor...',
+      proof_verified: 'Ödeme onaylandı: {amount} XMR',
+      proof_no_match: 'Çıktılar eşleşmiyor — TX anahtarı ya da adresi eşleşmiyor',
+      proof_tx_not_found: 'İşlem bulunamadı',
+      proof_error: 'Onaylama hatası',
+      status_paid: 'Ödeme yapıldı',
+      status_pending: 'Beklemede',
+      proof_confirmed_pending: 'Bulunan çıktı: {amount} XMR — {n}/10 tamamlanan. Otomatik yenileniyor…',
+      toast_integrity_warning: 'Uyarı: eşleşmeyen imza tespit edildi'
     }
   };
 

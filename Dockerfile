@@ -1,7 +1,12 @@
+FROM caddy:2-alpine AS caddy
+
 FROM php:8.3-fpm-alpine AS base
 
+# Copy Caddy binary from official image (avoids stale Alpine package)
+COPY --from=caddy /usr/bin/caddy /usr/sbin/caddy
+
 # Install PHP curl extension (needed for API proxies)
-RUN apk add --no-cache caddy curl-dev \
+RUN apk add --no-cache curl-dev \
     && docker-php-ext-install curl \
     && rm -rf /var/cache/apk/*
 
